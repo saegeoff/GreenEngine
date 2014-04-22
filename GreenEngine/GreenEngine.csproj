@@ -34,6 +34,14 @@
   <ItemGroup>
     <Compile Include="MyClass.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Model\FiniteElementModel.cs" />
+    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\Element.cs" />
+    <Compile Include="Model\BeamElement.cs" />
+    <Compile Include="Model\Material.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
 </Project>

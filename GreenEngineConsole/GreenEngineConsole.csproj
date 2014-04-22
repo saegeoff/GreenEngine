@@ -36,4 +36,10 @@
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\GreenEngine\GreenEngine.csproj">
+      <Project>{6FB5CA0F-A762-43BF-82D2-57923314F802}</Project>
+      <Name>GreenEngine</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
