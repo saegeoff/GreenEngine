@@ -5,7 +5,11 @@ using System.Text;
 
 namespace GreenEngine.Model
 {
-    class TrussElement : Element
+    public class TrussElement : Element
     {
+        public Node Node1;
+        public Node Node2;
+
+        public Material Material;
     }
 }
