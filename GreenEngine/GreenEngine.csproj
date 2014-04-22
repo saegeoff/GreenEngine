@@ -38,6 +38,7 @@
     <Compile Include="Model\Element.cs" />
     <Compile Include="Model\BeamElement.cs" />
     <Compile Include="Model\Material.cs" />
+    <Compile Include="Model\TrussElement.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
