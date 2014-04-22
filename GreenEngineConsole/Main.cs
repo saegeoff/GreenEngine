@@ -7,6 +7,8 @@ namespace GreenEngineConsole
 	{
 		public static void Main (string[] args)
 		{
+			FiniteElementModel fem = GetModel ();
+
 
 
 

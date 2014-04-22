@@ -1,6 +1,6 @@
 using System;
 
-namespace GreenEngine
+namespace GreenEngine.Model
 {
 	public class Material
 	{
