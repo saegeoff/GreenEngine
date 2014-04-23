@@ -11,6 +11,12 @@ namespace GreenEngine.Model
 			Z = 0.0;
 		}
 
+        public int NodeId
+        {
+            get;
+            set;
+        }
+
 		public double X 
 		{
 			get;
@@ -28,6 +34,9 @@ namespace GreenEngine.Model
 			get;
 			set;
 		}
+
+        public bool Fx = false;
+        public bool Fy = false;
 	}
 }
 

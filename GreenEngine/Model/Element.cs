@@ -8,7 +8,11 @@ namespace GreenEngine
 		{
 		}
 
-
+		public int ElementId 
+        {
+			get;
+			set;
+		}
 	}
 }
 

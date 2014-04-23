@@ -9,6 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>GreenEngine</RootNamespace>
     <AssemblyName>GreenEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -30,6 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Core" />
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.3.0.0-beta01\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -39,7 +45,13 @@
     <Compile Include="Model\BeamElement.cs" />
     <Compile Include="Model\Material.cs" />
     <Compile Include="Model\TrussElement.cs" />
+    <Compile Include="TestEngine.cs" />
+    <Compile Include="Model\Load.cs" />
+    <Compile Include="Model\ConcentratedLoad.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
