@@ -47,9 +47,35 @@ namespace GreenEngine
             }
            
             Matrix<double> m = new SparseMatrix(degreeSetSolve.Count, degreeSetSolve.Count);
-		}
+		
+            foreach (Element element in fem.ElementList)
+            {
+                if (element is TrussElement)
+                {
+                    GetTrussMatrix(element as TrussElement, m, degreeSetSolve);
+                }
+            }
+        }
 
+        protected void GetTrussMatrix(TrussElement element, Matrix<double> m, HashSet<Tuple<int, DegreeType>> set)
+        {
+            double A = element.Area;
+            double E = element.Material.ElasticModulus;
+            double dX = element.Node2.X - element.Node1.X;
+            double dY = element.Node2.Y - element.Node1.Y;
+            double L = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
 
+            double AEL = (A * E) / L;
+
+            double angle = Math.Atan2(dX, dY) * (180.0 / Math.PI);
+
+            double c = Math.Cos(angle);
+            double c2 = c * c;
+            double s = Math.Sin(angle);
+            double s2 = s * s;
+
+            double sc = s * c;
+        }
 	}
 }
 
