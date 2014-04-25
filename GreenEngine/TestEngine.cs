@@ -24,7 +24,7 @@ namespace GreenEngine
 		public void Analyze(FiniteElementModel fem)
 		{
 			HashSet<Tuple<int, DegreeType>> degreeSet = new HashSet<Tuple<int, DegreeType>>();
-            HashSet<Tuple<int, DegreeType>> degreeSetSolve = new HashSet<Tuple<int, DegreeType>>();
+            List<Tuple<int, DegreeType>> degreeListSolve = new List<Tuple<int, DegreeType>>();
 
             // Determine degrees
 			// for now just do X and Y for truss * nodes
@@ -32,8 +32,8 @@ namespace GreenEngine
             {
                 degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
                 degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
-                degreeSetSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
-                degreeSetSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
+                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
+                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
             }
 
             // This should be moved up.  I am just hacking stuff together to learn a procedure
@@ -57,7 +57,7 @@ namespace GreenEngine
             }
         }
 
-        protected void GetTrussMatrix(TrussElement element, Matrix<double> m, HashSet<Tuple<int, DegreeType>> set)
+        protected void GetTrussMatrix(TrussElement element, Matrix<double> m, List<Tuple<int, DegreeType>> list)
         {
             double A = element.Area;
             double E = element.Material.ElasticModulus;
@@ -73,8 +73,13 @@ namespace GreenEngine
             double c2 = c * c;
             double s = Math.Sin(angle);
             double s2 = s * s;
-
             double sc = s * c;
+
+            // Row 1
+            if (list.Contains(Tuple.Create<int, DegreeType>(element.Node1.NodeId, DegreeType.X)))
+            {
+
+            }
         }
 	}
 }
