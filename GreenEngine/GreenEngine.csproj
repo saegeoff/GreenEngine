@@ -48,6 +48,7 @@
     <Compile Include="TestEngine.cs" />
     <Compile Include="Model\Load.cs" />
     <Compile Include="Model\ConcentratedLoad.cs" />
+    <Compile Include="Model\NodeCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

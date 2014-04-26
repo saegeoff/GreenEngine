@@ -48,11 +48,6 @@ namespace GreenEngine
            
             Matrix<double> m = new SparseMatrix(degreeListSolve.Count, degreeListSolve.Count);
 
-            /*
-            string s = m.ToString();
-
-            int x;
-		*/
            
             foreach (Element element in fem.ElementList)
             {
