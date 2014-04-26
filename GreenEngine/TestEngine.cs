@@ -40,21 +40,57 @@ namespace GreenEngine
             foreach (Node node in fem.NodeList)
             {
                 if (node.Fx)
-                    degreeSetSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
 
                 if (node.Fy)
-                    degreeSetSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
             }
            
-            Matrix<double> m = new SparseMatrix(degreeSetSolve.Count, degreeSetSolve.Count);
-		
+            Matrix<double> m = new SparseMatrix(degreeListSolve.Count, degreeListSolve.Count);
+
+            /*
+            string s = m.ToString();
+
+            int x;
+		*/
+           
             foreach (Element element in fem.ElementList)
             {
                 if (element is TrussElement)
                 {
-                    GetTrussMatrix(element as TrussElement, m, degreeSetSolve);
+                    GetTrussMatrix((TrussElement)element, m, degreeListSolve);
                 }
             }
+
+            Vector<double> loads = new SparseVector(degreeListSolve.Count);
+
+            foreach (Load load in fem.LoadList)
+            {
+                if (load is ConcentratedLoad)
+                {
+                    ConcentratedLoad conLoad = (ConcentratedLoad)load;
+
+                    int x1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.X);
+                    int y1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Y);
+
+                    if (x1Index >= 0)
+                        loads[x1Index] += conLoad.X;
+
+                    if (y1Index >= 0)
+                        loads[y1Index] += conLoad.Y;
+                }
+            }
+
+            Console.WriteLine(m.ToString());
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(loads.ToString());
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Vector<double> displacements = m.Solve(loads);
+
+            Console.WriteLine(displacements.ToString());
         }
 
         protected void GetTrussMatrix(TrussElement element, Matrix<double> m, List<Tuple<int, DegreeType>> list)
@@ -65,9 +101,11 @@ namespace GreenEngine
             double dY = element.Node2.Y - element.Node1.Y;
             double L = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
 
-            double AEL = (A * E) / L;
+            double AEL = 1.0;//(A * E) / L;
 
-            double angle = Math.Atan2(dX, dY) * (180.0 / Math.PI);
+            double angle = Math.Atan2(dX, dY);
+
+            //Console.WriteLine(angle);
 
             double c = Math.Cos(angle);
             double c2 = c * c;
@@ -75,10 +113,74 @@ namespace GreenEngine
             double s2 = s * s;
             double sc = s * c;
 
-            // Row 1
-            if (list.Contains(Tuple.Create<int, DegreeType>(element.Node1.NodeId, DegreeType.X)))
-            {
+            int x1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.X);
+            int y1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.Y);
+            int x2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.X);
+            int y2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.Y);
 
+
+            // Row 1
+            if (x1Index >= 0)
+            {
+                if (x1Index >= 0)
+                    m[x1Index, x1Index] += AEL * c2;
+
+                if (y1Index >= 0)
+                    m[x1Index, y1Index] += AEL * sc;
+
+                if (x2Index >= 0)
+                    m[x1Index, x2Index] += AEL * -c2;
+
+                if (y2Index >= 0)
+                    m[x1Index, y2Index] += AEL * -sc;
+            }
+
+            // Row 2
+            if (y1Index >= 0)
+            {
+                if (x1Index >= 0)
+                    m[y1Index, x1Index] += AEL * sc;
+                
+                if (y1Index >= 0)
+                    m[y1Index, y1Index] += AEL * s2;
+                
+                if (x2Index >= 0)
+                    m[y1Index, x2Index] += AEL * -sc;
+                
+                if (y2Index >= 0)
+                    m[y1Index, y2Index] += AEL * -s2;
+            }
+
+            // Row 3
+            if (x2Index >= 0)
+            {
+                if (x1Index >= 0)
+                    m[x2Index, x1Index] += AEL * -c2;
+                
+                if (y1Index >= 0)
+                    m[x2Index, y1Index] += AEL * -sc;
+                
+                if (x2Index >= 0)
+                    m[x2Index, x2Index] += AEL * c2;
+                
+                if (y2Index >= 0)
+                    m[x2Index, y2Index] += AEL * sc;
+            }
+
+            // Row 4
+            if (y2Index >= 0)
+            {
+                if (x1Index >= 0)
+                    m[y2Index, x1Index] += AEL * -sc;
+                
+                if (y1Index >= 0)
+                    m[y2Index, y1Index] += AEL * -s2;
+                
+                if (x2Index >= 0)
+                    m[y2Index, x2Index] += AEL * sc;
+                
+                if (y2Index >= 0)
+                    m[y2Index, y2Index] += AEL * s2;
             }
         }
 	}

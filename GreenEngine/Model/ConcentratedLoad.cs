@@ -14,12 +14,6 @@ namespace GreenEngine.Model
             set;
         }
 
-        public double Load
-        {
-            get;
-            set;
-        }
-
         public double X;
         public double Y;
         public double Z;
