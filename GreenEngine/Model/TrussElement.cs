@@ -7,12 +7,17 @@ namespace GreenEngine.Model
 {
     public class TrussElement : Element
     {
+        public TrussElement()
+            : base()
+        {
+            Area = 0.0;
+        }
 
-        // TODO: These should be properties... this is quick and dirty
-        public Node Node1;
-        public Node Node2;
+        public Node Node1 { get; set; }
+        public Node Node2 { get; set; }
 
-        public Material Material;
-        public double Area;
+        public Material Material { get; set; }
+
+        public double Area { get; set; }
     }
 }
