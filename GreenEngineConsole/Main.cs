@@ -13,7 +13,7 @@ namespace GreenEngineConsole
             TestEngine engine = new TestEngine();
             engine.Analyze(fem);
 
-
+            Console.ReadKey();
 		}
 
 		public static FiniteElementModel GetModel()
@@ -24,28 +24,28 @@ namespace GreenEngineConsole
             node1.NodeId = 1;
 			node1.X = 0.0;
 			node1.Y = 0.0;
-            node1.Fx = true;
-            node1.Fy = true;
+            node1.Tx = false;
+            node1.Ty = false;
 			
 			Node node2 = new Node ();
             node2.NodeId = 2;
 			node2.X = 10.0;
 			node2.Y = 0.0;
-            node2.Fy = true;
+            node2.Ty = false;
 			
 			Node node3 = new Node ();
             node3.NodeId = 3;
 			node3.X = 10.0;
 			node3.Y = 10.0;
 			
-			fem.NodeList.Add (node1);
-			fem.NodeList.Add (node2);
-			fem.NodeList.Add (node3);
+			fem.Nodes.Add (node1);
+            fem.Nodes.Add(node2);
+            fem.Nodes.Add(node3);
 			
 			Material material = new Material ();
 			material.ElasticModulus = 10000000.0;
 			
-			fem.MaterialList.Add (material);
+			fem.Materials.Add (material);
 
             TrussElement truss1 = new TrussElement();
             truss1.ElementId = 1;
@@ -68,9 +68,9 @@ namespace GreenEngineConsole
             truss3.Material = material;
             truss3.Area = 10.0;
 
-            fem.ElementList.Add(truss1);
-            fem.ElementList.Add(truss2);
-            fem.ElementList.Add(truss3);
+            fem.Elements.Add(truss1);
+            fem.Elements.Add(truss2);
+            fem.Elements.Add(truss3);
 
 
             ConcentratedLoad load1 = new ConcentratedLoad();
@@ -78,7 +78,7 @@ namespace GreenEngineConsole
             load1.X = 707.1;
             load1.Y = 707.1;
 
-            fem.LoadList.Add(load1);
+            fem.Loads.Add(load1);
 
 			return fem;
 		}
@@ -91,14 +91,14 @@ namespace GreenEngineConsole
             node1.NodeId = 1;
             node1.X = 0.0;
             node1.Y = 0.0;
-            node1.Fx = true;
-            node1.Fy = true;
+            node1.Tx = false;
+            node1.Ty = false;
             
             Node node2 = new Node ();
             node2.NodeId = 2;
             node2.X = 40.0;
             node2.Y = 0.0;
-            node2.Fy = true;
+            node2.Ty = false;
             
             Node node3 = new Node ();
             node3.NodeId = 3;
@@ -109,18 +109,18 @@ namespace GreenEngineConsole
             node4.NodeId = 4;
             node4.X = 0.0;
             node4.Y = 30.0;
-            node4.Fx = true;
-            node4.Fy = true;
+            node4.Tx = false;
+            node4.Ty = false;
             
-            fem.NodeList.Add (node1);
-            fem.NodeList.Add (node2);
-            fem.NodeList.Add (node3);
-            fem.NodeList.Add (node4);
+            fem.Nodes.Add (node1);
+            fem.Nodes.Add(node2);
+            fem.Nodes.Add(node3);
+            fem.Nodes.Add(node4);
             
             Material material = new Material ();
             material.ElasticModulus = 29.5 * Math.Pow(10.0, 6.0);
             
-            fem.MaterialList.Add (material);
+            fem.Materials.Add (material);
             
             TrussElement truss1 = new TrussElement();
             truss1.ElementId = 1;
@@ -150,10 +150,10 @@ namespace GreenEngineConsole
             truss4.Material = material;
             truss4.Area = 1.0;
             
-            fem.ElementList.Add(truss1);
-            fem.ElementList.Add(truss2);
-            fem.ElementList.Add(truss3);
-            fem.ElementList.Add(truss4);
+            fem.Elements.Add(truss1);
+            fem.Elements.Add(truss2);
+            fem.Elements.Add(truss3);
+            fem.Elements.Add(truss4);
             
             
             ConcentratedLoad load1 = new ConcentratedLoad();
@@ -164,8 +164,8 @@ namespace GreenEngineConsole
             load2.Node = node3;
             load2.Y = -25000.0;
             
-            fem.LoadList.Add(load1);
-            fem.LoadList.Add(load2);
+            fem.Loads.Add(load1);
+            fem.Loads.Add(load2);
 
             return fem;
         }

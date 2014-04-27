@@ -28,7 +28,7 @@ namespace GreenEngine
 
             // Determine degrees
 			// for now just do X and Y for truss * nodes
-            foreach (Node node in fem.NodeList)
+            foreach (Node node in fem.Nodes)
             {
                 degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
                 degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
@@ -37,19 +37,19 @@ namespace GreenEngine
             }
 
             // This should be moved up.  I am just hacking stuff together to learn a procedure
-            foreach (Node node in fem.NodeList)
+            foreach (Node node in fem.Nodes)
             {
-                if (node.Fx)
+                if (!node.Tx)
                     degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
 
-                if (node.Fy)
+                if (!node.Ty)
                     degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
             }
            
             Matrix<double> m = new SparseMatrix(degreeListSolve.Count, degreeListSolve.Count);
 
            
-            foreach (Element element in fem.ElementList)
+            foreach (Element element in fem.Elements)
             {
                 if (element is TrussElement)
                 {
@@ -59,7 +59,7 @@ namespace GreenEngine
 
             Vector<double> loads = new SparseVector(degreeListSolve.Count);
 
-            foreach (Load load in fem.LoadList)
+            foreach (Load load in fem.Loads)
             {
                 if (load is ConcentratedLoad)
                 {
@@ -96,9 +96,9 @@ namespace GreenEngine
             double dY = element.Node2.Y - element.Node1.Y;
             double L = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
 
-            double AEL = 1.0;//(A * E) / L;
+            double AEL = (A * E) / L;
 
-            double angle = Math.Atan2(dX, dY);
+            double angle = Math.Atan2(dY, dX);
 
             //Console.WriteLine(angle);
 

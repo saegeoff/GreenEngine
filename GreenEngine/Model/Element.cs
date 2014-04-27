@@ -2,17 +2,14 @@ using System;
 
 namespace GreenEngine
 {
-	public class Element
-	{
-		public Element ()
-		{
-		}
-
-		public int ElementId 
+    public class Element
+    {
+        public Element()
         {
-			get;
-			set;
-		}
-	}
+            ElementId = -1;
+        }
+
+        public int ElementId { get; set; }
+    }
 }
 

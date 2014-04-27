@@ -5,14 +5,34 @@ namespace GreenEngine.Model
 {
 	public class FiniteElementModel
 	{
-		public FiniteElementModel ()
+        protected MaterialCollection m_MaterialCollection = new MaterialCollection();
+        protected NodeCollection m_NodeCollection = new NodeCollection();
+        protected ElementCollection m_ElementCollection = new ElementCollection();
+        protected LoadCollection m_LoadCollection = new LoadCollection();
+        
+        public FiniteElementModel ()
 		{
 		}
 
-		public List<Material> MaterialList = new List<Material>();
-		public List<Node> NodeList = new List<Node>();
-		public List<Element> ElementList = new List<Element>();
-        public List<Load> LoadList = new List<Load>();
+        public MaterialCollection Materials
+        {
+            get { return m_MaterialCollection; }
+        }
+
+        public NodeCollection Nodes
+        {
+            get { return m_NodeCollection; }
+        }
+
+        public ElementCollection Elements
+        {
+            get { return m_ElementCollection; }
+        }
+
+        public LoadCollection Loads
+        {
+            get { return m_LoadCollection; }
+        }
 	}
 }
 

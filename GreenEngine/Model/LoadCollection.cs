@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace GreenEngine.Model
 {
-    public class NodeCollection : IList<Node>
+    public class LoadCollection : IList<Load>
     {
-        IList<Node> m_Data = new List<Node>();
+        IList<Load> m_Data = new List<Load>();
         
-        public NodeCollection()
+        public LoadCollection()
         {
         }
 
-        public int IndexOf(Node item)
+        public int IndexOf(Load item)
         {
             return m_Data.IndexOf(item);
         }
 
-        public void Insert(int index, Node item)
+        public void Insert(int index, Load item)
         {
             m_Data.Insert(index, item);
         }
@@ -26,7 +26,7 @@ namespace GreenEngine.Model
             m_Data.RemoveAt(index);
         }
 
-        public Node this[int index]
+        public Load this[int index]
         {
             get
             {
@@ -38,7 +38,7 @@ namespace GreenEngine.Model
             }
         }
 
-        public void Add(Node item)
+        public void Add(Load item)
         {
             m_Data.Add(item);
         }
@@ -48,12 +48,12 @@ namespace GreenEngine.Model
             m_Data.Clear();
         }
 
-        public bool Contains(Node item)
+        public bool Contains(Load item)
         {
             return m_Data.Contains(item);
         }
 
-        public void CopyTo(Node[] array, int arrayIndex)
+        public void CopyTo(Load[] array, int arrayIndex)
         {
             m_Data.CopyTo(array, arrayIndex);
         }
@@ -68,12 +68,12 @@ namespace GreenEngine.Model
             get { return m_Data.IsReadOnly; }
         }
 
-        public bool Remove(Node item)
+        public bool Remove(Load item)
         {
             return m_Data.Remove(item);
         }
 
-        public IEnumerator<Node> GetEnumerator()
+        public IEnumerator<Load> GetEnumerator()
         {
             return m_Data.GetEnumerator();
         }
