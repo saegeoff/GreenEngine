@@ -36,14 +36,13 @@ namespace GreenEngine
                 degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
             }
 
-            // This should be moved up.  I am just hacking stuff together to learn a procedure
-            foreach (Node node in fem.Nodes)
+            foreach (Support support in fem.Supports)
             {
-                if (!node.Tx)
-                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
+                if (support.Tx == Support.TranslationType.Constrained)
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.X));
 
-                if (!node.Ty)
-                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
+                if (support.Ty == Support.TranslationType.Constrained)
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
             }
            
             Matrix<double> m = new SparseMatrix(degreeListSolve.Count, degreeListSolve.Count);
@@ -99,8 +98,6 @@ namespace GreenEngine
             double AEL = (A * E) / L;
 
             double angle = Math.Atan2(dY, dX);
-
-            //Console.WriteLine(angle);
 
             double c = Math.Cos(angle);
             double c2 = c * c;

@@ -8,6 +8,7 @@ namespace GreenEngine.Model
         protected MaterialCollection m_MaterialCollection = new MaterialCollection();
         protected NodeCollection m_NodeCollection = new NodeCollection();
         protected ElementCollection m_ElementCollection = new ElementCollection();
+        protected SupportCollection m_SupportCollection = new SupportCollection();
         protected LoadCollection m_LoadCollection = new LoadCollection();
         
         public FiniteElementModel ()
@@ -27,6 +28,11 @@ namespace GreenEngine.Model
         public ElementCollection Elements
         {
             get { return m_ElementCollection; }
+        }
+
+        public SupportCollection Supports
+        {
+            get { return m_SupportCollection; }
         }
 
         public LoadCollection Loads

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ElementMatrices\ElementMatrix.cs" />
     <Compile Include="Model\MaterialCollection.cs" />
     <Compile Include="Model\LoadCollection.cs" />
     <Compile Include="Model\ElementCollection.cs" />
@@ -49,12 +50,14 @@
     <Compile Include="Model\Element.cs" />
     <Compile Include="Model\BeamElement.cs" />
     <Compile Include="Model\Material.cs" />
+    <Compile Include="Model\Support.cs" />
+    <Compile Include="Model\SupportCollection.cs" />
     <Compile Include="Model\TrussElement.cs" />
     <Compile Include="TestEngine.cs" />
     <Compile Include="Model\Load.cs" />
     <Compile Include="Model\ConcentratedLoad.cs" />
     <Compile Include="Model\NodeCollection.cs" />
-    <Compile Include="ElementMatrix\TrussMatrix1.cs" />
+    <Compile Include="ElementMatrices\TrussElementMatrix.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -62,8 +65,5 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <ItemGroup>
-    <Folder Include="Containers\" />
-    <Folder Include="ElementMatrix\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

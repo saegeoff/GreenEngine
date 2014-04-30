@@ -24,26 +24,35 @@ namespace GreenEngineConsole
             node1.NodeId = 1;
 			node1.X = 0.0;
 			node1.Y = 0.0;
-            node1.Tx = false;
-            node1.Ty = false;
 			
 			Node node2 = new Node ();
             node2.NodeId = 2;
 			node2.X = 10.0;
 			node2.Y = 0.0;
-            node2.Ty = false;
 			
 			Node node3 = new Node ();
             node3.NodeId = 3;
 			node3.X = 10.0;
 			node3.Y = 10.0;
 			
-			fem.Nodes.Add (node1);
+			fem.Nodes.Add(node1);
             fem.Nodes.Add(node2);
             fem.Nodes.Add(node3);
+
+            Support support1 = new Support();
+            support1.Tx = Support.TranslationType.Constrained;
+            support1.Ty = Support.TranslationType.Constrained;
+            support1.Node = node1;
+
+            Support support2 = new Support();
+            support2.Ty = Support.TranslationType.Constrained;
+            support2.Node = node2;
+
+            fem.Supports.Add(support1);
+            fem.Supports.Add(support2);
 			
 			Material material = new Material ();
-			material.ElasticModulus = 10000000.0;
+            material.ElasticModulus = 29.5e6;
 			
 			fem.Materials.Add (material);
 
@@ -52,21 +61,21 @@ namespace GreenEngineConsole
             truss1.Node1 = node1;
             truss1.Node2 = node2;
             truss1.Material = material;
-            truss1.Area = 10.0;
+            truss1.Area = 1.0;
 
             TrussElement truss2 = new TrussElement();
             truss2.ElementId = 2;
             truss2.Node1 = node2;
             truss2.Node2 = node3;
             truss2.Material = material;
-            truss2.Area = 10.0;
+            truss2.Area = 1.0;
 
             TrussElement truss3 = new TrussElement();
             truss3.ElementId = 3;
             truss3.Node1 = node3;
             truss3.Node2 = node1;
             truss3.Material = material;
-            truss3.Area = 10.0;
+            truss3.Area = 1.0;
 
             fem.Elements.Add(truss1);
             fem.Elements.Add(truss2);
@@ -91,14 +100,11 @@ namespace GreenEngineConsole
             node1.NodeId = 1;
             node1.X = 0.0;
             node1.Y = 0.0;
-            node1.Tx = false;
-            node1.Ty = false;
             
             Node node2 = new Node ();
             node2.NodeId = 2;
             node2.X = 40.0;
             node2.Y = 0.0;
-            node2.Ty = false;
             
             Node node3 = new Node ();
             node3.NodeId = 3;
@@ -109,16 +115,32 @@ namespace GreenEngineConsole
             node4.NodeId = 4;
             node4.X = 0.0;
             node4.Y = 30.0;
-            node4.Tx = false;
-            node4.Ty = false;
             
-            fem.Nodes.Add (node1);
+            fem.Nodes.Add(node1);
             fem.Nodes.Add(node2);
             fem.Nodes.Add(node3);
             fem.Nodes.Add(node4);
-            
+
+            Support support1 = new Support();
+            support1.Tx = Support.TranslationType.Constrained;
+            support1.Ty = Support.TranslationType.Constrained;
+            support1.Node = node1;
+
+            Support support2 = new Support();
+            support2.Ty = Support.TranslationType.Constrained;
+            support2.Node = node2;
+
+            Support support4 = new Support();
+            support4.Tx = Support.TranslationType.Constrained;
+            support4.Ty = Support.TranslationType.Constrained;
+            support4.Node = node4;
+
+            fem.Supports.Add(support1);
+            fem.Supports.Add(support2);
+            fem.Supports.Add(support4);
+
             Material material = new Material ();
-            material.ElasticModulus = 29.5 * Math.Pow(10.0, 6.0);
+            material.ElasticModulus = 29.5e6;
             
             fem.Materials.Add (material);
             
