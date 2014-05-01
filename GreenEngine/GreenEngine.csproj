@@ -57,7 +57,8 @@
     <Compile Include="Model\Load.cs" />
     <Compile Include="Model\ConcentratedLoad.cs" />
     <Compile Include="Model\NodeCollection.cs" />
-    <Compile Include="ElementMatrices\TrussElementMatrix.cs" />
+    <Compile Include="LinearEngine2d.cs" />
+    <Compile Include="ElementMatrices\TrussElementMatrix2d.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -66,4 +67,7 @@
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Results\" />
+  </ItemGroup>
 </Project>

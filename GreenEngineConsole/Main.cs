@@ -10,7 +10,7 @@ namespace GreenEngineConsole
 		{
 			FiniteElementModel fem = GetModel2 ();
 
-            TestEngine engine = new TestEngine();
+            LinearEngine2d engine = new LinearEngine2d();
             engine.Analyze(fem);
 
             Console.ReadKey();
