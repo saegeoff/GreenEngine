@@ -8,13 +8,6 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace GreenEngine
 {
-	// Move this once we are done... this is just for hacking
-    public enum DegreeType
-    {
-        X,
-        Y
-    }
-
     public class TestEngine
 	{
 		public TestEngine ()

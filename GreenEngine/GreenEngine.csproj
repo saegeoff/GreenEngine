@@ -59,6 +59,10 @@
     <Compile Include="Model\NodeCollection.cs" />
     <Compile Include="LinearEngine2d.cs" />
     <Compile Include="ElementMatrices\TrussElementMatrix2d.cs" />
+    <Compile Include="Results\NodalDisplacement.cs" />
+    <Compile Include="Results\NodalDisplacementCollection.cs" />
+    <Compile Include="DegreeType.cs" />
+    <Compile Include="Results\AnalysisResults.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

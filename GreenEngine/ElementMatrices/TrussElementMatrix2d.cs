@@ -46,26 +46,48 @@ namespace GreenEngine.ElementMatrices
             m_Matrix [3, 1] = m_Matrix [1, 3] = ael * -s2;
         }
 
-        public override SortedSet<Tuple<int, DegreeType>> GetDegreesOfFreedomSet()
+        public override void CopyDegreesOfFreedomToSet(SortedSet<Tuple<int, DegreeType>> degreeSet)
         {
-            SortedSet<Tuple<int, DegreeType>> degreeSet = new SortedSet<Tuple<int, DegreeType>>();
-
             degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X));
             degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y));
             degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X));
             degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y));
-
-            return degreeSet;
         }
 
-        public override void CopyToGlobal(Matrix<double> globalMatrix, SortedSet<Tuple<int, DegreeType>> globalDofSet)
+        public override void CopyToGlobal(Matrix<double> globalMatrix, List<Tuple<int, DegreeType>> elementDegreeSolveList)
         {
-            bool n1x = globalDofSet.Contains(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X));
-            bool n1y = globalDofSet.Contains(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y));
-            bool n2x = globalDofSet.Contains(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X));
-            bool n2y = globalDofSet.Contains(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y));
+            int x1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId1 && x.Item2 == DegreeType.X);
+            int y1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId1 && x.Item2 == DegreeType.Y);
+            int x2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId2 && x.Item2 == DegreeType.X);
+            int y2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId2 && x.Item2 == DegreeType.Y);
 
+            AddToGlobalMatrix(0, 0, x1Index, x1Index, globalMatrix);
+            AddToGlobalMatrix(1, 0, x1Index, y1Index, globalMatrix);
+            AddToGlobalMatrix(2, 0, x1Index, x2Index, globalMatrix);
+            AddToGlobalMatrix(3, 0, x1Index, y2Index, globalMatrix);
 
+            AddToGlobalMatrix(0, 1, y1Index, x1Index, globalMatrix);
+            AddToGlobalMatrix(1, 1, y1Index, y1Index, globalMatrix);
+            AddToGlobalMatrix(2, 1, y1Index, x2Index, globalMatrix);
+            AddToGlobalMatrix(3, 1, y1Index, y2Index, globalMatrix);
+
+            AddToGlobalMatrix(0, 2, x2Index, x1Index, globalMatrix);
+            AddToGlobalMatrix(1, 2, x2Index, y1Index, globalMatrix);
+            AddToGlobalMatrix(2, 2, x2Index, x2Index, globalMatrix);
+            AddToGlobalMatrix(3, 2, x2Index, y2Index, globalMatrix);
+
+            AddToGlobalMatrix(0, 3, y2Index, x1Index, globalMatrix);
+            AddToGlobalMatrix(1, 3, y2Index, y1Index, globalMatrix);
+            AddToGlobalMatrix(2, 3, y2Index, x2Index, globalMatrix);
+            AddToGlobalMatrix(3, 3, y2Index, y2Index, globalMatrix);
+        }
+
+        protected void AddToGlobalMatrix(int lX, int lY, int gX, int gY, Matrix<double> globalMatrix)
+        {
+            if (gX < 0 || gY < 0)
+                return;
+
+            globalMatrix [gX, gY] += m_Matrix [lX, lY]; 
         }
     }
 }
