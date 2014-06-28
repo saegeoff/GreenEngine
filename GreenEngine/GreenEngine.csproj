@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6FB5CA0F-A762-43BF-82D2-57923314F802}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>GreenEngine</RootNamespace>
@@ -36,7 +34,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Core" />
     <Reference Include="MathNet.Numerics">
-      <HintPath>..\packages\MathNet.Numerics.3.0.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <HintPath>..\packages\MathNet.Numerics.3.0.2\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -65,13 +63,10 @@
     <Compile Include="Results\AnalysisResults.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <ItemGroup />
   <ItemGroup>
     <Folder Include="Results\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
