@@ -18,14 +18,8 @@ namespace GreenEngine.ElementMatrices
             get { return m_DegreesOfFreedom; }
         }
 
-        public virtual void CopyDegreesOfFreedomToSet(SortedSet<Tuple<int, DegreeType>> degreeSet)
-        {
+        public abstract void CopyDegreesOfFreedomToSet(SortedSet<Tuple<int, DegreeType>> degreeSet);
 
-        }
-
-        public virtual void CopyToGlobal(Matrix<double> globalMatrix, List<Tuple<int, DegreeType>> elementDegreeSolveList)
-        {
-
-        }
+        public abstract void CopyToGlobal(Matrix<double> globalMatrix, List<Tuple<int, DegreeType>> elementDegreeSolveList);
     }
 }

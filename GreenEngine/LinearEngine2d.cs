@@ -12,12 +12,20 @@ namespace GreenEngine
 {
     public class LinearEngine2d
 	{
-		public LinearEngine2d()
+        private AnalysisResults results;
+
+        public LinearEngine2d()
 		{
 		}
 
+        public AnalysisResults Results
+        {
+            get { return this.results; }
+        }
+
 		public void Analyze(FiniteElementModel fem)
 		{
+            this.results = new AnalysisResults();
             List<ElementMatrix> elementMatrixList = new List<ElementMatrix>();
             SortedSet<Tuple<int, DegreeType>> elementDegreeSet = new SortedSet<Tuple<int, DegreeType>>();
 
@@ -83,18 +91,28 @@ namespace GreenEngine
                 }
             }
 
-            AnalysisResults results = new AnalysisResults();
+            // Solve problem
+            Vector<double> displacements = globalStiffnessMatrix.Solve(loads);
 
+
+            // Populate Results
             foreach (Tuple<int, DegreeType> degree in elementDegreeSet)
             {
                 NodalDisplacement displacement = new NodalDisplacement();
                 displacement.NodeId = degree.Item1;
                 displacement.Degree = degree.Item2;
-                results.NodalDisplacements.Add(displacement);
+                this.results.NodalDisplacements.Add(displacement);
+
+                // we need to use a dictionary for this!
+                int dispIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == degree.Item1 && x.Item2 == degree.Item2);
+
+                if (dispIndex >= 0)
+                    displacement.Displacement = displacements[dispIndex];
+                   
             }
 
-            Vector<double> displacements = globalStiffnessMatrix.Solve(loads);
 
+            // debugging
             Console.WriteLine(globalStiffnessMatrix.ToString());
             Console.WriteLine();
             Console.WriteLine();
@@ -102,96 +120,7 @@ namespace GreenEngine
             Console.WriteLine();
             Console.WriteLine();
 
-            Console.WriteLine(displacements.ToString());
-        }
 
-        protected void GetTrussMatrix(TrussElement element, Matrix<double> m, List<Tuple<int, DegreeType>> list)
-        {
-            double A = element.Area;
-            double E = element.Material.ElasticModulus;
-            double dX = element.Node2.X - element.Node1.X;
-            double dY = element.Node2.Y - element.Node1.Y;
-            double L = Math.Sqrt(Math.Pow(dX, 2) + Math.Pow(dY, 2));
-
-            double AEL = (A * E) / L;
-
-            double angle = Math.Atan2(dY, dX);
-
-            double c = Math.Cos(angle);
-            double c2 = c * c;
-            double s = Math.Sin(angle);
-            double s2 = s * s;
-            double sc = s * c;
-
-            int x1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.X);
-            int y1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.Y);
-            int x2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.X);
-            int y2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.Y);
-
-
-            // Row 1
-            if (x1Index >= 0)
-            {
-                if (x1Index >= 0)
-                    m[x1Index, x1Index] += AEL * c2;
-
-                if (y1Index >= 0)
-                    m[x1Index, y1Index] += AEL * sc;
-
-                if (x2Index >= 0)
-                    m[x1Index, x2Index] += AEL * -c2;
-
-                if (y2Index >= 0)
-                    m[x1Index, y2Index] += AEL * -sc;
-            }
-
-            // Row 2
-            if (y1Index >= 0)
-            {
-                if (x1Index >= 0)
-                    m[y1Index, x1Index] += AEL * sc;
-                
-                if (y1Index >= 0)
-                    m[y1Index, y1Index] += AEL * s2;
-                
-                if (x2Index >= 0)
-                    m[y1Index, x2Index] += AEL * -sc;
-                
-                if (y2Index >= 0)
-                    m[y1Index, y2Index] += AEL * -s2;
-            }
-
-            // Row 3
-            if (x2Index >= 0)
-            {
-                if (x1Index >= 0)
-                    m[x2Index, x1Index] += AEL * -c2;
-                
-                if (y1Index >= 0)
-                    m[x2Index, y1Index] += AEL * -sc;
-                
-                if (x2Index >= 0)
-                    m[x2Index, x2Index] += AEL * c2;
-                
-                if (y2Index >= 0)
-                    m[x2Index, y2Index] += AEL * sc;
-            }
-
-            // Row 4
-            if (y2Index >= 0)
-            {
-                if (x1Index >= 0)
-                    m[y2Index, x1Index] += AEL * -sc;
-                
-                if (y1Index >= 0)
-                    m[y2Index, y1Index] += AEL * -s2;
-                
-                if (x2Index >= 0)
-                    m[y2Index, x2Index] += AEL * sc;
-                
-                if (y2Index >= 0)
-                    m[y2Index, y2Index] += AEL * s2;
-            }
         }
 	}
 }

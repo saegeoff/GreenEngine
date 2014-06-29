@@ -1,6 +1,7 @@
 using System;
 using GreenEngine.Model;
 using GreenEngine;
+using GreenEngine.Results;
 
 namespace GreenEngineConsole
 {
@@ -12,6 +13,14 @@ namespace GreenEngineConsole
 
             LinearEngine2d engine = new LinearEngine2d();
             engine.Analyze(fem);
+
+            AnalysisResults results = engine.Results;
+
+            foreach (NodalDisplacement disp in results.NodalDisplacements)
+            {
+                string sDispString = string.Format("Node: {0},  DOF: {1},  Displacement: {2}", disp.NodeId, disp.Degree, disp.Displacement);
+                Console.WriteLine(sDispString);
+            }
 
             Console.ReadKey();
 		}

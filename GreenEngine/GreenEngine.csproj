@@ -61,10 +61,12 @@
     <Compile Include="Results\NodalDisplacementCollection.cs" />
     <Compile Include="DegreeType.cs" />
     <Compile Include="Results\AnalysisResults.cs" />
+    <Compile Include="MasterMatrices\GlobalMatrix.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Results\" />
+    <Folder Include="MasterMatrices\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
