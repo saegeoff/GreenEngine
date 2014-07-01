@@ -66,6 +66,7 @@
     <Compile Include="Results\ElementStress.cs" />
     <Compile Include="Results\SupportReaction.cs" />
     <Compile Include="Results\SupportReactionCollection.cs" />
+    <Compile Include="ResultsBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

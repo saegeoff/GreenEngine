@@ -12,26 +12,63 @@ namespace GreenEngine
 {
     public class LinearEngine2d
 	{
-        private AnalysisResults results;
+        protected FiniteElementModel m_Model;
+
+        List<ElementMatrix> m_ElementMatrixList = new List<ElementMatrix>();
+        SortedSet<Tuple<int, DegreeType>> m_DegreeOfFreedomSet = new SortedSet<Tuple<int, DegreeType>>();
+        SortedSet<Tuple<int, DegreeType>> m_DegreeOfFreedomSupportSet = new SortedSet<Tuple<int, DegreeType>>();
+        Dictionary<Tuple<int, DegreeType>, int> m_DegreeOfFreedomSolveDictionary = new Dictionary<Tuple<int, DegreeType>, int>();
+        Matrix<double> m_GlobalStiffnessMatrix;
+        Vector<double> m_LoadsVector;
+        Vector<double> m_DisplacementsVector;
 
         public LinearEngine2d()
 		{
 		}
 
-        public AnalysisResults Results
-        {
-            get { return this.results; }
+        public AnalysisResults Analyze(FiniteElementModel model)
+		{
+            m_Model = model;
+
+            m_ElementMatrixList.Clear();
+            m_DegreeOfFreedomSet.Clear();
+            m_DegreeOfFreedomSupportSet.Clear();
+            m_DegreeOfFreedomSolveDictionary.Clear();
+
+            // Build local stiffness matrix for each element
+            BuildLocalStiffnessMatricies();
+                
+            // Build support degrees of freedom set
+            BuildSupportDegreesOfFreedomSet();
+
+            // Build degree of freedom solve map
+            BuildDegreeOfFreedomSolveMap();
+
+            // Build Global Stiffness Matrix
+            BuildGlobalStiffnessMatrix();
+
+            // Build Loads Vector
+            BuildLoadsVector();
+
+            // Solve problem
+            m_DisplacementsVector = m_GlobalStiffnessMatrix.Solve(m_LoadsVector);
+
+            // debugging
+            Console.WriteLine(m_GlobalStiffnessMatrix.ToString());
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(m_LoadsVector.ToString());
+            Console.WriteLine();
+            Console.WriteLine();
+
+            // Build Results
+            return BuildResults();
         }
 
-		public void Analyze(FiniteElementModel fem)
-		{
-            this.results = new AnalysisResults();
-            List<ElementMatrix> elementMatrixList = new List<ElementMatrix>();
-            SortedSet<Tuple<int, DegreeType>> elementDegreeSet = new SortedSet<Tuple<int, DegreeType>>();
-
-
+        protected void BuildLocalStiffnessMatricies()
+        {
             // Build local stiffness matrices
-            foreach (Element element in fem.Elements)
+            foreach (Element element in m_Model.Elements)
             {
                 ElementMatrix elementMatrix;
 
@@ -45,189 +82,82 @@ namespace GreenEngine
                     continue;
                 }
 
-                elementMatrix.CopyDegreesOfFreedomToSet(elementDegreeSet);
-                elementMatrixList.Add(elementMatrix);
+                m_DegreeOfFreedomSet.UnionWith(elementMatrix.GetDegreesOfFreedom());
+                m_ElementMatrixList.Add(elementMatrix);
             }
+        }
 
-            SortedSet<Tuple<int, DegreeType>> elementDegreeSolveSet = new SortedSet<Tuple<int, DegreeType>>(elementDegreeSet);
-
-
-            // Remove supports from degrees of freedom solve set
-            foreach (Support support in fem.Supports)
+        protected void BuildSupportDegreesOfFreedomSet()
+        {
+            foreach (Support support in m_Model.Supports)
             {
                 if (support.Tx == Support.TranslationType.Constrained)
-                    elementDegreeSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.X));
+                    m_DegreeOfFreedomSupportSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.X));
 
                 if (support.Ty == Support.TranslationType.Constrained)
-                    elementDegreeSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
+                    m_DegreeOfFreedomSupportSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
             }
+        }
 
-            List<Tuple<int, DegreeType>> elementDegreeSolveList = new List<Tuple<int, DegreeType>>(elementDegreeSolveSet);
-
-            Matrix<double> globalStiffnessMatrix = new SparseMatrix(elementDegreeSolveSet.Count, elementDegreeSolveSet.Count);
-
-            // Build Global Stiffness Matrix
-            foreach (ElementMatrix matrix in elementMatrixList)
+        protected void BuildDegreeOfFreedomSolveMap()
+        {
+            int iDofPosition = 0;
+            foreach (Tuple<int, DegreeType> dof in m_DegreeOfFreedomSet)
             {
-                matrix.CopyToGlobal(globalStiffnessMatrix, elementDegreeSolveList);
+                if (m_DegreeOfFreedomSupportSet.Contains(dof))
+                    continue;
+
+                m_DegreeOfFreedomSolveDictionary.Add(dof, iDofPosition++);
             }
+        }
 
-            Vector<double> loads = new SparseVector(elementDegreeSolveSet.Count);
+        protected void BuildGlobalStiffnessMatrix()
+        {
+            m_GlobalStiffnessMatrix = new SparseMatrix(m_DegreeOfFreedomSolveDictionary.Count, m_DegreeOfFreedomSolveDictionary.Count);
+            foreach (ElementMatrix matrix in m_ElementMatrixList)
+            {
+                matrix.CopyToGlobal(m_GlobalStiffnessMatrix, m_DegreeOfFreedomSolveDictionary);
+            }
+        }
 
-            foreach (Load load in fem.Loads)
+        protected void BuildLoadsVector()
+        {
+            m_LoadsVector = new SparseVector(m_DegreeOfFreedomSolveDictionary.Count);
+            foreach (Load load in m_Model.Loads)
             {
                 if (load is ConcentratedLoad)
                 {
                     ConcentratedLoad conLoad = (ConcentratedLoad)load;
-
-                    int x1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.X);
-                    int y1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Y);
-
-                    if (x1Index >= 0)
-                        loads[x1Index] += conLoad.X;
-
-                    if (y1Index >= 0)
-                        loads[y1Index] += conLoad.Y;
+                    int xIndex = -1;
+                    int yIndex = -1;
+                    Tuple<int, DegreeType> xTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.X);
+                    Tuple<int, DegreeType> yTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.Y);
+                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(xTuple))
+                    {
+                        xIndex = m_DegreeOfFreedomSolveDictionary[xTuple];
+                        m_LoadsVector[xIndex] += conLoad.X;
+                    }
+                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(yTuple))
+                    {
+                        yIndex = m_DegreeOfFreedomSolveDictionary[yTuple];
+                        m_LoadsVector[yIndex] += conLoad.Y;
+                    }
                 }
             }
+        }
 
-            // Solve problem
-            Vector<double> displacements = globalStiffnessMatrix.Solve(loads);
+        protected AnalysisResults BuildResults()
+        {
+            ResultsBuilder resultsBuilder = new ResultsBuilder();
 
+            resultsBuilder.Model = m_Model;
+            resultsBuilder.ElementMatrixList = m_ElementMatrixList;
+            resultsBuilder.DegreeOfFreedomSet = m_DegreeOfFreedomSet;
+            resultsBuilder.DegreeOfFreedomSupportSet = m_DegreeOfFreedomSupportSet;
+            resultsBuilder.DegreeOfFreedomSolveDictionary = m_DegreeOfFreedomSolveDictionary;
+            resultsBuilder.DisplacementsVector = m_DisplacementsVector;
 
-            // Populate Results ---- Displacements
-            Dictionary<int, NodalDisplacement> displacementDictionary = new Dictionary<int, NodalDisplacement>();
-            foreach (Node node in fem.Nodes)
-            {
-                NodalDisplacement displacement = new NodalDisplacement();
-                displacement.NodeId = node.NodeId;
-                this.results.NodalDisplacements.Add(displacement);
-                displacementDictionary.Add(node.NodeId, displacement);  
-            }
-
-            foreach (Tuple<int, DegreeType> degree in elementDegreeSet)
-            {
-                NodalDisplacement displacement = displacementDictionary[degree.Item1];
-                DegreeType degreeType = degree.Item2;
-
-
-                // we need to use a dictionary for this!
-                int dispIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == degree.Item1 && x.Item2 == degree.Item2);
-
-                if (dispIndex >= 0)
-                {
-                    if (degreeType == DegreeType.X)
-                        displacement.X = displacements[dispIndex];
-                    else if (degreeType == DegreeType.Y)
-                        displacement.Y = displacements[dispIndex];
-                }
-            }
-
-            // Populate Results ---- Stresses
-            Dictionary<int, ElementStress> stressDictionary = new Dictionary<int, ElementStress>();
-            foreach (Element element in fem.Elements)
-            {
-                ElementStress stress = new ElementStress();
-                stress.ElementId = element.ElementId;
-                this.results.ElementStresses.Add(stress);
-                stressDictionary.Add(element.ElementId, stress);  
-            }
-
-            foreach (ElementMatrix matrix in elementMatrixList)
-            {
-                if (matrix is TrussElementMatrix2d)
-                {
-                    TrussElementMatrix2d trussMatrix = (TrussElementMatrix2d)matrix;
-                    ElementStress stress = stressDictionary [trussMatrix.ElementId];
-
-                    int x1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == trussMatrix.NodeId1 && x.Item2 == DegreeType.X);
-                    int y1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == trussMatrix.NodeId1 && x.Item2 == DegreeType.Y);
-                    int x2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == trussMatrix.NodeId2 && x.Item2 == DegreeType.X);
-                    int y2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == trussMatrix.NodeId2 && x.Item2 == DegreeType.Y);
-
-                    double q1 = 0.0;
-                    double q2 = 0.0;
-                    double q3 = 0.0;
-                    double q4 = 0.0;
-
-                    if (x1Index >= 0)
-                        q1 = displacements [x1Index];
-
-                    if (y1Index >= 0)
-                        q2 = displacements [y1Index];
-
-                    if (x2Index >= 0)
-                        q3 = displacements [x2Index];
-
-                    if (y2Index >= 0)
-                        q4 = displacements [y2Index];
-
-                    stress.Stress = trussMatrix.GetStress(q1, q2, q3, q4);
-
-                }
-            }
-
-
-            // Support Reactions
-            int iNumSupportConstraints = 0;
-            Dictionary<int, SupportReaction> supportReactionDictionary = new Dictionary<int, SupportReaction>();
-            foreach (Support support in fem.Supports)
-            {
-                SupportReaction supportReaction = new SupportReaction();
-                supportReaction.NodeId = support.Node.NodeId;
-                this.results.SupportReactions.Add(supportReaction);
-                supportReactionDictionary.Add(support.Node.NodeId, supportReaction);
-
-                iNumSupportConstraints += support.GetNumberOfConstraints();
-            }
-
-            Matrix<double> supportStiffnessMatrix = new SparseMatrix(fem.Nodes.Count * 2 /* nodes * xy(2) */, iNumSupportConstraints);
-
-
-            Vector<double> supportStiffnessDisplacements = new SparseVector(fem.Nodes.Count * 2 /* nodes * xy(2) */);
-
-            for (int i = 0; i < fem.Nodes.Count; i++)
-            {
-                Node node = fem.Nodes [i];
-
-                int xIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == node.NodeId && x.Item2 == DegreeType.X);
-                int yIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == node.NodeId && x.Item2 == DegreeType.Y);
-
-                if (xIndex >= 0)
-                    supportStiffnessDisplacements [(i * 2)] = displacements [xIndex];
-                else
-                    supportStiffnessDisplacements [(i * 2)] = 0.0;
-
-                if (yIndex >= 0)
-                    supportStiffnessDisplacements [(i * 2) + 1] = displacements [yIndex];
-                else
-                    supportStiffnessDisplacements [(i * 2) + 1] = 0.0;
-            }
-
-//            SortedSet<Tuple<int, DegreeType>> elementSupportSolveSet = new SortedSet<Tuple<int, DegreeType>>(elementDegreeSet);
-//
-//
-//            // Remove supports from degrees of freedom solve set
-//            foreach (Support support in fem.Supports)
-//            {
-//                if (support.Tx == Support.TranslationType.Constrained)
-//                    elementSupportSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.X));
-//
-//                if (support.Ty == Support.TranslationType.Constrained)
-//                    elementSupportSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
-//            }
-//
-//            List<Tuple<int, DegreeType>> elementSupportSolveList = new List<Tuple<int, DegreeType>>(elementDegreeSolveSet);
-
-            // debugging
-            Console.WriteLine(globalStiffnessMatrix.ToString());
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(loads.ToString());
-            Console.WriteLine();
-            Console.WriteLine();
-
-
+            return resultsBuilder.BuildResults();
         }
 	}
 }

@@ -12,9 +12,7 @@ namespace GreenEngineConsole
 			FiniteElementModel fem = GetModel2 ();
 
             LinearEngine2d engine = new LinearEngine2d();
-            engine.Analyze(fem);
-
-            AnalysisResults results = engine.Results;
+            AnalysisResults results = engine.Analyze(fem);
 
             Console.WriteLine("------------------------------------------------------------------");
             Console.WriteLine("Node Displacements:");

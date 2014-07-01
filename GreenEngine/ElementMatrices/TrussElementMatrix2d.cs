@@ -7,7 +7,6 @@ namespace GreenEngine.ElementMatrices
 {
     class TrussElementMatrix2d : ElementMatrix
     {
-        protected double[,] m_Matrix = new double[4, 4];
         protected int m_NodeId1 = -1;
         protected int m_NodeId2 = -1;
         protected int m_ElementId = -1;
@@ -21,6 +20,7 @@ namespace GreenEngine.ElementMatrices
             base()
         {
             m_DegreesOfFreedom = 4;
+            m_Matrix = new double[m_DegreesOfFreedom, m_DegreesOfFreedom];
 
             m_NodeId1 = element.Node1.NodeId;
             m_NodeId2 = element.Node2.NodeId;
@@ -82,20 +82,41 @@ namespace GreenEngine.ElementMatrices
             get { return m_ElementId; }
         }
 
-        public override void CopyDegreesOfFreedomToSet(SortedSet<Tuple<int, DegreeType>> degreeSet)
+        public override IEnumerable<Tuple<int, DegreeType>> GetDegreesOfFreedom()
         {
-            degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X));
-            degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y));
-            degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X));
-            degreeSet.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y));
+            List<Tuple<int, DegreeType>> degreesOfFreedomList = new List<Tuple<int, DegreeType>>();
+
+            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X));
+            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y));
+            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X));
+            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y));
+
+            return degreesOfFreedomList;
         }
 
-        public override void CopyToGlobal(Matrix<double> globalMatrix, List<Tuple<int, DegreeType>> elementDegreeSolveList)
+        public override void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> degreeOfFreedomSolveDictionary)
         {
-            int x1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId1 && x.Item2 == DegreeType.X);
-            int y1Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId1 && x.Item2 == DegreeType.Y);
-            int x2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId2 && x.Item2 == DegreeType.X);
-            int y2Index = elementDegreeSolveList.FindIndex(x => x.Item1 == m_NodeId2 && x.Item2 == DegreeType.Y);
+            int x1Index = -1;
+            int y1Index = -1;
+            int x2Index = -1;
+            int y2Index = -1;
+
+            Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
+            Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
+            Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
+            Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
+
+            if (degreeOfFreedomSolveDictionary.ContainsKey(x1Tuple))
+                x1Index = degreeOfFreedomSolveDictionary[x1Tuple];
+
+            if (degreeOfFreedomSolveDictionary.ContainsKey(y1Tuple))
+                y1Index = degreeOfFreedomSolveDictionary[y1Tuple];
+
+            if (degreeOfFreedomSolveDictionary.ContainsKey(x2Tuple))
+                x2Index = degreeOfFreedomSolveDictionary[x2Tuple];
+
+            if (degreeOfFreedomSolveDictionary.ContainsKey(y2Tuple))
+                y2Index = degreeOfFreedomSolveDictionary[y2Tuple];
 
             AddToGlobalMatrix(0, 0, x1Index, x1Index, globalMatrix);
             AddToGlobalMatrix(1, 0, x1Index, y1Index, globalMatrix);
@@ -116,14 +137,6 @@ namespace GreenEngine.ElementMatrices
             AddToGlobalMatrix(1, 3, y2Index, y1Index, globalMatrix);
             AddToGlobalMatrix(2, 3, y2Index, x2Index, globalMatrix);
             AddToGlobalMatrix(3, 3, y2Index, y2Index, globalMatrix);
-        }
-
-        protected void AddToGlobalMatrix(int lX, int lY, int gX, int gY, Matrix<double> globalMatrix)
-        {
-            if (gX < 0 || gY < 0)
-                return;
-
-            globalMatrix [gX, gY] += m_Matrix [lX, lY]; 
         }
     }
 }
