@@ -16,11 +16,31 @@ namespace GreenEngineConsole
 
             AnalysisResults results = engine.Results;
 
+            Console.WriteLine("------------------------------------------------------------------");
+            Console.WriteLine("Node Displacements:");
             foreach (NodalDisplacement disp in results.NodalDisplacements)
             {
-                string sDispString = string.Format("Node: {0},  DOF: {1},  Displacement: {2}", disp.NodeId, disp.Degree, disp.Displacement);
-                Console.WriteLine(sDispString);
+                Console.WriteLine(disp);
             }
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Element Stresses:");
+            foreach (ElementStress stress in results.ElementStresses)
+            {
+                Console.WriteLine(stress);
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Support Reactions:");
+            foreach (SupportReaction supportReaction in results.SupportReactions)
+            {
+                Console.WriteLine(supportReaction);
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+
 
             Console.ReadKey();
 		}

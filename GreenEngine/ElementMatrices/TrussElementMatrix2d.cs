@@ -10,6 +10,12 @@ namespace GreenEngine.ElementMatrices
         protected double[,] m_Matrix = new double[4, 4];
         protected int m_NodeId1 = -1;
         protected int m_NodeId2 = -1;
+        protected int m_ElementId = -1;
+
+        protected double m_E = 0.0;
+        protected double m_L = 0.0;
+        protected double m_S = 0.0;
+        protected double m_C = 0.0;
         
         public TrussElementMatrix2d(TrussElement element) :
             base()
@@ -18,6 +24,7 @@ namespace GreenEngine.ElementMatrices
 
             m_NodeId1 = element.Node1.NodeId;
             m_NodeId2 = element.Node2.NodeId;
+            m_ElementId = element.ElementId;
 
             double a = element.Area;
             double e = element.Material.ElasticModulus;
@@ -44,6 +51,35 @@ namespace GreenEngine.ElementMatrices
             m_Matrix [3, 0] = m_Matrix [1, 2] = ael * -cs;
             m_Matrix [2, 1] = m_Matrix [0, 3] = ael * -cs;
             m_Matrix [3, 1] = m_Matrix [1, 3] = ael * -s2;
+
+            m_E = e;
+            m_L = l;
+            m_S = s;
+            m_C = c;
+        }
+
+        public double GetStress(double q1, double q2, double q3, double q4)
+        {
+            double dRet = 0.0;
+
+            dRet = (m_E / m_L) * ((-m_C * q1) + (-m_S * q2) + (m_C * q3) + (m_S * q4));
+
+            return dRet;
+        }
+
+        public int NodeId1
+        {
+            get { return m_NodeId1; }
+        }
+
+        public int NodeId2
+        {
+            get { return m_NodeId2; }
+        }
+
+        public int ElementId
+        {
+            get { return m_ElementId; }
         }
 
         public override void CopyDegreesOfFreedomToSet(SortedSet<Tuple<int, DegreeType>> degreeSet)

@@ -62,6 +62,10 @@
     <Compile Include="DegreeType.cs" />
     <Compile Include="Results\AnalysisResults.cs" />
     <Compile Include="MasterMatrices\GlobalMatrix.cs" />
+    <Compile Include="Results\ElementStressCollection.cs" />
+    <Compile Include="Results\ElementStress.cs" />
+    <Compile Include="Results\SupportReaction.cs" />
+    <Compile Include="Results\SupportReactionCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

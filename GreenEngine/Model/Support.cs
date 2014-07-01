@@ -40,5 +40,30 @@ namespace GreenEngine.Model
         public RotationType Rx { get; set; }
         public RotationType Ry { get; set; }
         public RotationType Rz { get; set; }
+
+        public int GetNumberOfConstraints()
+        {
+            int i = 0;
+
+            if (Tx == TranslationType.Constrained)
+                ++i;
+
+            if (Ty == TranslationType.Constrained)
+                ++i;
+
+            if (Tz == TranslationType.Constrained)
+                ++i;
+
+            if (Rx == RotationType.Constrained)
+                ++i;
+
+            if (Ry == RotationType.Constrained)
+                ++i;
+
+            if (Rz == RotationType.Constrained)
+                ++i;
+
+            return i;
+        }
     }
 }
