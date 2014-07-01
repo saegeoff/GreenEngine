@@ -125,9 +125,9 @@ namespace GreenEngine
             m_LoadsVector = new SparseVector(m_DegreeOfFreedomSolveDictionary.Count);
             foreach (Load load in m_Model.Loads)
             {
-                if (load is ConcentratedLoad)
+                if (load is ConcentratedNodalLoad)
                 {
-                    ConcentratedLoad conLoad = (ConcentratedLoad)load;
+                    ConcentratedNodalLoad conLoad = (ConcentratedNodalLoad)load;
                     int xIndex = -1;
                     int yIndex = -1;
                     Tuple<int, DegreeType> xTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.X);

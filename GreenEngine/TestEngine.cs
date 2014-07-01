@@ -53,9 +53,9 @@ namespace GreenEngine
 
             foreach (Load load in fem.Loads)
             {
-                if (load is ConcentratedLoad)
+                if (load is ConcentratedNodalLoad)
                 {
-                    ConcentratedLoad conLoad = (ConcentratedLoad)load;
+                    ConcentratedNodalLoad conLoad = (ConcentratedNodalLoad)load;
 
                     int x1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.X);
                     int y1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Y);

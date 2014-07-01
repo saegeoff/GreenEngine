@@ -109,7 +109,7 @@ namespace GreenEngineConsole
             fem.Elements.Add(truss3);
 
 
-            ConcentratedLoad load1 = new ConcentratedLoad();
+            ConcentratedNodalLoad load1 = new ConcentratedNodalLoad();
             load1.Node = node3;
             load1.X = 707.1;
             load1.Y = 707.1;
@@ -205,11 +205,11 @@ namespace GreenEngineConsole
             fem.Elements.Add(truss4);
             
             
-            ConcentratedLoad load1 = new ConcentratedLoad();
+            ConcentratedNodalLoad load1 = new ConcentratedNodalLoad();
             load1.Node = node2;
             load1.X = 20000.0;
 
-            ConcentratedLoad load2 = new ConcentratedLoad();
+            ConcentratedNodalLoad load2 = new ConcentratedNodalLoad();
             load2.Node = node3;
             load2.Y = -25000.0;
             

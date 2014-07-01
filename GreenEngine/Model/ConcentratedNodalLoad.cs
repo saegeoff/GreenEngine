@@ -2,9 +2,9 @@ using System;
 
 namespace GreenEngine.Model
 {
-    public class ConcentratedLoad : Load
+    public class ConcentratedNodalLoad : Load
     {
-        public ConcentratedLoad()
+        public ConcentratedNodalLoad()
         {
         }
 
