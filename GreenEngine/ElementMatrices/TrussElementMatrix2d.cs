@@ -94,17 +94,17 @@ namespace GreenEngine.ElementMatrices
             return degreesOfFreedomList;
         }
 
-        public override void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> globalIndexDictionary)
+        protected override void CopyToMatrix(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> xDictionary, IDictionary<Tuple<int, DegreeType>, int> yDictionary)
         {
             Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
             Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
             Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
             Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
 
-            int x1Index = globalIndexDictionary[x1Tuple];
-            int y1Index = globalIndexDictionary[y1Tuple];
-            int x2Index = globalIndexDictionary[x2Tuple];
-            int y2Index = globalIndexDictionary[y2Tuple];
+            int x1Index = xDictionary[x1Tuple];
+            int y1Index = yDictionary[y1Tuple];
+            int x2Index = xDictionary[x2Tuple];
+            int y2Index = yDictionary[y2Tuple];
 
             AddToGlobalMatrix(0, 0, x1Index, x1Index, globalMatrix);
             AddToGlobalMatrix(1, 0, x1Index, y1Index, globalMatrix);

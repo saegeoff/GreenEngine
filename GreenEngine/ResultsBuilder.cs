@@ -13,6 +13,7 @@ namespace GreenEngine
         protected List<ElementMatrix> m_ElementMatrixList;
         protected SortedSet<Tuple<int, DegreeType>> m_AllDegreeOfFreedomSet;
         protected SortedSet<Tuple<int, DegreeType>> m_SupportDegreeOfFreedomSet;
+        protected Dictionary<Tuple<int, DegreeType>, int> m_AllGlobalIndexDictionary;
         protected Dictionary<Tuple<int, DegreeType>, int> m_GlobalIndexDictionary;
         protected Vector<double> m_DisplacementsVector;
         //protected Matrix<double> globalStiffnessMatrix;
@@ -43,6 +44,12 @@ namespace GreenEngine
         { 
             get { return m_SupportDegreeOfFreedomSet; }
             set { m_SupportDegreeOfFreedomSet = value; }
+        }
+
+        public Dictionary<Tuple<int, DegreeType>, int> AllGlobalIndexDictionary
+        { 
+            get { return m_AllGlobalIndexDictionary; }
+            set { m_AllGlobalIndexDictionary = value; }
         }
 
         public Dictionary<Tuple<int, DegreeType>, int> GlobalIndexDictionary
