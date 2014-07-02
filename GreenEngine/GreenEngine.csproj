@@ -10,8 +10,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -55,7 +53,6 @@
     <Compile Include="Model\TrussElement.cs" />
     <Compile Include="TestEngine.cs" />
     <Compile Include="Model\Load.cs" />
-    <Compile Include="Model\ConcentratedLoad.cs" />
     <Compile Include="Model\NodeCollection.cs" />
     <Compile Include="LinearEngine2d.cs" />
     <Compile Include="ElementMatrices\TrussElementMatrix2d.cs" />
@@ -69,6 +66,7 @@
     <Compile Include="Results\SupportReaction.cs" />
     <Compile Include="Results\SupportReactionCollection.cs" />
     <Compile Include="ResultsBuilder.cs" />
+    <Compile Include="Model\ConcentratedNodalLoad.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

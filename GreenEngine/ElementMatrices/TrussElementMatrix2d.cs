@@ -94,29 +94,17 @@ namespace GreenEngine.ElementMatrices
             return degreesOfFreedomList;
         }
 
-        public override void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> degreeOfFreedomSolveDictionary)
+        public override void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> globalIndexDictionary)
         {
-            int x1Index = -1;
-            int y1Index = -1;
-            int x2Index = -1;
-            int y2Index = -1;
-
             Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
             Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
             Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
             Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
 
-            if (degreeOfFreedomSolveDictionary.ContainsKey(x1Tuple))
-                x1Index = degreeOfFreedomSolveDictionary[x1Tuple];
-
-            if (degreeOfFreedomSolveDictionary.ContainsKey(y1Tuple))
-                y1Index = degreeOfFreedomSolveDictionary[y1Tuple];
-
-            if (degreeOfFreedomSolveDictionary.ContainsKey(x2Tuple))
-                x2Index = degreeOfFreedomSolveDictionary[x2Tuple];
-
-            if (degreeOfFreedomSolveDictionary.ContainsKey(y2Tuple))
-                y2Index = degreeOfFreedomSolveDictionary[y2Tuple];
+            int x1Index = globalIndexDictionary[x1Tuple];
+            int y1Index = globalIndexDictionary[y1Tuple];
+            int x2Index = globalIndexDictionary[x2Tuple];
+            int y2Index = globalIndexDictionary[y2Tuple];
 
             AddToGlobalMatrix(0, 0, x1Index, x1Index, globalMatrix);
             AddToGlobalMatrix(1, 0, x1Index, y1Index, globalMatrix);

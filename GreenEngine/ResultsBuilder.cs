@@ -11,9 +11,9 @@ namespace GreenEngine
     {
         protected FiniteElementModel m_Model;
         protected List<ElementMatrix> m_ElementMatrixList;
-        protected SortedSet<Tuple<int, DegreeType>> m_DegreeOfFreedomSet;
-        protected SortedSet<Tuple<int, DegreeType>> m_DegreeOfFreedomSupportSet;
-        protected Dictionary<Tuple<int, DegreeType>, int> m_DegreeOfFreedomSolveDictionary;
+        protected SortedSet<Tuple<int, DegreeType>> m_AllDegreeOfFreedomSet;
+        protected SortedSet<Tuple<int, DegreeType>> m_SupportDegreeOfFreedomSet;
+        protected Dictionary<Tuple<int, DegreeType>, int> m_GlobalIndexDictionary;
         protected Vector<double> m_DisplacementsVector;
         //protected Matrix<double> globalStiffnessMatrix;
 
@@ -33,22 +33,22 @@ namespace GreenEngine
             set { m_ElementMatrixList = value; }
         }
 
-        public SortedSet<Tuple<int, DegreeType>>  DegreeOfFreedomSet
+        public SortedSet<Tuple<int, DegreeType>>  AllDegreeOfFreedomSet
         { 
-            get { return m_DegreeOfFreedomSet; }
-            set { m_DegreeOfFreedomSet = value; }
+            get { return m_AllDegreeOfFreedomSet; }
+            set { m_AllDegreeOfFreedomSet = value; }
         }
 
-        public SortedSet<Tuple<int, DegreeType>>  DegreeOfFreedomSupportSet
+        public SortedSet<Tuple<int, DegreeType>>  SupportDegreeOfFreedomSet
         { 
-            get { return m_DegreeOfFreedomSupportSet; }
-            set { m_DegreeOfFreedomSupportSet = value; }
+            get { return m_SupportDegreeOfFreedomSet; }
+            set { m_SupportDegreeOfFreedomSet = value; }
         }
 
-        public Dictionary<Tuple<int, DegreeType>, int> DegreeOfFreedomSolveDictionary
+        public Dictionary<Tuple<int, DegreeType>, int> GlobalIndexDictionary
         { 
-            get { return m_DegreeOfFreedomSolveDictionary; }
-            set { m_DegreeOfFreedomSolveDictionary = value; }
+            get { return m_GlobalIndexDictionary; }
+            set { m_GlobalIndexDictionary = value; }
         }
 
         public Vector<double> DisplacementsVector
@@ -84,13 +84,13 @@ namespace GreenEngine
                 displacementDictionary.Add(node.NodeId, displacement);  
             }
 
-            foreach (Tuple<int, DegreeType> degree in m_DegreeOfFreedomSet)
+            foreach (Tuple<int, DegreeType> degree in m_AllDegreeOfFreedomSet)
             {
-                if (m_DegreeOfFreedomSolveDictionary.ContainsKey(degree))
+                int index = m_GlobalIndexDictionary[degree];
+
+                if (index >= 0)
                 {
                     NodalDisplacement displacement = displacementDictionary[degree.Item1];
-
-                    int index = m_DegreeOfFreedomSolveDictionary[degree];
 
                     if (degree.Item2 == DegreeType.X)
                         displacement.X = m_DisplacementsVector[index];
@@ -130,17 +130,22 @@ namespace GreenEngine
                     Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.X);
                     Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Y);
 
-                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(x1Tuple))
-                        q1 = m_DisplacementsVector [m_DegreeOfFreedomSolveDictionary[x1Tuple]];
+                    int q1Index = m_GlobalIndexDictionary[x1Tuple];
+                    int q2Index = m_GlobalIndexDictionary[y1Tuple];
+                    int q3Index = m_GlobalIndexDictionary[x2Tuple];
+                    int q4Index = m_GlobalIndexDictionary[y2Tuple];
 
-                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(y1Tuple))
-                        q2 = m_DisplacementsVector [m_DegreeOfFreedomSolveDictionary[y1Tuple]];
+                    if (q1Index >= 0)
+                        q1 = m_DisplacementsVector [q1Index];
 
-                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(x2Tuple))
-                        q3 = m_DisplacementsVector [m_DegreeOfFreedomSolveDictionary[x2Tuple]];
+                    if (q2Index >= 0)
+                        q2 = m_DisplacementsVector [q2Index];
 
-                    if (m_DegreeOfFreedomSolveDictionary.ContainsKey(y2Tuple))
-                        q4 = m_DisplacementsVector [m_DegreeOfFreedomSolveDictionary[y2Tuple]];
+                    if (q3Index >= 0)
+                        q3 = m_DisplacementsVector [q3Index];
+
+                    if (q4Index >= 0)
+                        q4 = m_DisplacementsVector [q4Index];
 
                     stress.Stress = trussMatrix.GetStress(q1, q2, q3, q4);
                 }

@@ -21,7 +21,7 @@ namespace GreenEngine.ElementMatrices
 
         public abstract IEnumerable<Tuple<int, DegreeType>> GetDegreesOfFreedom();
 
-        public abstract void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> degreeOfFreedomSolveDictionary);
+        public abstract void CopyToGlobal(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> globalIndexDictionary);
     
         protected void AddToGlobalMatrix(int lX, int lY, int gX, int gY, Matrix<double> globalMatrix)
         {
