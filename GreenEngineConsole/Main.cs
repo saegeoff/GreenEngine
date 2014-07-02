@@ -9,7 +9,7 @@ namespace GreenEngineConsole
 	{
 		public static void Main (string[] args)
 		{
-			FiniteElementModel fem = GetModel2 ();
+            FiniteElementModel fem = GetModel3();
 
             LinearEngine2d engine = new LinearEngine2d();
             AnalysisResults results = engine.Analyze(fem);
@@ -215,6 +215,74 @@ namespace GreenEngineConsole
             
             fem.Loads.Add(load1);
             fem.Loads.Add(load2);
+
+            return fem;
+        }
+
+        public static FiniteElementModel GetModel3()
+        {
+            FiniteElementModel fem = new FiniteElementModel();
+
+            Node node1 = new Node ();
+            node1.NodeId = 1;
+            node1.X = 0.0;
+            node1.Y = 0.0;
+
+            Node node2 = new Node ();
+            node2.NodeId = 2;
+            node2.X = 155.8845727;
+            node2.Y = -90.0;
+
+            Node node3 = new Node ();
+            node3.NodeId = 3;
+            node3.X = 311.7691454;
+            node3.Y = 0.0;
+
+            fem.Nodes.Add(node1);
+            fem.Nodes.Add(node2);
+            fem.Nodes.Add(node3);
+
+            Support support1 = new Support();
+            support1.Tx = Support.TranslationType.Constrained;
+            support1.Ty = Support.TranslationType.Constrained;
+            support1.Node = node1;
+
+            Support support2 = new Support();
+            support2.Tx = Support.TranslationType.Constrained;
+            support2.Ty = Support.TranslationType.Constrained;
+            support2.Node = node3;
+
+            fem.Supports.Add(support1);
+            fem.Supports.Add(support2);
+
+            Material material = new Material ();
+            material.ElasticModulus = 30.0e6;
+
+            fem.Materials.Add (material);
+
+            TrussElement truss1 = new TrussElement();
+            truss1.ElementId = 1;
+            truss1.Node1 = node1;
+            truss1.Node2 = node2;
+            truss1.Material = material;
+            truss1.Area = 0.5;
+
+            TrussElement truss2 = new TrussElement();
+            truss2.ElementId = 2;
+            truss2.Node1 = node2;
+            truss2.Node2 = node3;
+            truss2.Material = material;
+            truss2.Area = 0.5;
+
+            fem.Elements.Add(truss1);
+            fem.Elements.Add(truss2);
+
+
+            ConcentratedNodalLoad load1 = new ConcentratedNodalLoad();
+            load1.Node = node2;
+            load1.Y = -5000.0;
+
+            fem.Loads.Add(load1);
 
             return fem;
         }
