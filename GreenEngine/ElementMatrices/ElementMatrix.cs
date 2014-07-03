@@ -21,24 +21,24 @@ namespace GreenEngine.ElementMatrices
 
         public abstract IEnumerable<Tuple<int, DegreeType>> GetDegreesOfFreedom();
 
-        public void CopyToGlobalMatrix(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> globalIndexDictionary)
+        public void CopyToGlobalMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> globalIndexDictionary)
         {
-            CopyToMatrix(globalMatrix, globalIndexDictionary, globalIndexDictionary);
+            CopyToMatrix(matrix, globalIndexDictionary, globalIndexDictionary);
         }
 
-        public void CopyToSupportMatrix(Matrix<double> supportMatrix, IDictionary<Tuple<int, DegreeType>, int> allGlobalIndexDictionary, IDictionary<Tuple<int, DegreeType>, int> supportGlobalIndexDictionary)
+        public void CopyToSupportMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> allGlobalIndexDictionary, IDictionary<Tuple<int, DegreeType>, int> supportGlobalIndexDictionary)
         {
-            CopyToMatrix(supportMatrix, allGlobalIndexDictionary, supportGlobalIndexDictionary);
+            CopyToMatrix(matrix, allGlobalIndexDictionary, supportGlobalIndexDictionary);
         }
     
         protected abstract void CopyToMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary);
 
-        protected void AddToGlobalMatrix(int lRow, int lCol, int gRow, int gCol, Matrix<double> globalMatrix)
+        protected void AddToMatrix( Matrix<double> matrix, int lRow, int lCol, int gRow, int gCol)
         {
             if (gRow < 0 || gCol < 0)
                 return;
 
-            globalMatrix [gRow, gCol] += m_Matrix [lRow, lCol]; 
+            matrix[gRow, gCol] += m_Matrix[lRow, lCol]; 
         }
     }
 }

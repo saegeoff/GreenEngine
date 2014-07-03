@@ -94,44 +94,35 @@ namespace GreenEngine.ElementMatrices
             return degreesOfFreedomList;
         }
 
-        protected override void CopyToMatrix(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary)
+        protected override void CopyToMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary)
         {
             Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
             Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
             Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
             Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
 
-            int x1RowIndex = rowDictionary[x1Tuple];
-            int x1ColIndex = colDictionary[x1Tuple];
+            int[] matrixRowIndex = new int[4];
+            int[] matrixColIndex = new int[4];
 
-            int y1RowIndex = rowDictionary[y1Tuple];
-            int y1ColIndex = colDictionary[y1Tuple];
+            matrixRowIndex[0] = rowDictionary[x1Tuple];
+            matrixColIndex[0] = colDictionary[x1Tuple];
 
-            int x2RowIndex = rowDictionary[x2Tuple];
-            int x2ColIndex = colDictionary[x2Tuple];
+            matrixRowIndex[1] = rowDictionary[y1Tuple];
+            matrixColIndex[1] = colDictionary[y1Tuple];
 
-            int y2RowIndex = rowDictionary[y2Tuple];
-            int y2ColIndex = colDictionary[y2Tuple];
+            matrixRowIndex[2] = rowDictionary[x2Tuple];
+            matrixColIndex[2] = colDictionary[x2Tuple];
 
-            AddToGlobalMatrix(0, 0, x1RowIndex, x1ColIndex, globalMatrix);
-            AddToGlobalMatrix(0, 1, x1RowIndex, y1ColIndex, globalMatrix);
-            AddToGlobalMatrix(0, 2, x1RowIndex, x2ColIndex, globalMatrix);
-            AddToGlobalMatrix(0, 3, x1RowIndex, y2ColIndex, globalMatrix);
+            matrixRowIndex[3] = rowDictionary[y2Tuple];
+            matrixColIndex[3] = colDictionary[y2Tuple];
 
-            AddToGlobalMatrix(1, 0, y1RowIndex, x1ColIndex, globalMatrix);
-            AddToGlobalMatrix(1, 1, y1RowIndex, y1ColIndex, globalMatrix);
-            AddToGlobalMatrix(1, 2, y1RowIndex, x2ColIndex, globalMatrix);
-            AddToGlobalMatrix(1, 3, y1RowIndex, y2ColIndex, globalMatrix);
-
-            AddToGlobalMatrix(2, 0, x2RowIndex, x1ColIndex, globalMatrix);
-            AddToGlobalMatrix(2, 1, x2RowIndex, y1ColIndex, globalMatrix);
-            AddToGlobalMatrix(2, 2, x2RowIndex, x2ColIndex, globalMatrix);
-            AddToGlobalMatrix(2, 3, x2RowIndex, y2ColIndex, globalMatrix);
-
-            AddToGlobalMatrix(3, 0, y2RowIndex, x1ColIndex, globalMatrix);
-            AddToGlobalMatrix(3, 1, y2RowIndex, y1ColIndex, globalMatrix);
-            AddToGlobalMatrix(3, 2, y2RowIndex, x2ColIndex, globalMatrix);
-            AddToGlobalMatrix(3, 3, y2RowIndex, y2ColIndex, globalMatrix);
+            for (int iRow = 0; iRow < 4; ++iRow)
+            {
+                for (int iCol = 0; iCol < 4; ++iCol)
+                {
+                    AddToMatrix(matrix, iRow, iCol, matrixRowIndex[iRow], matrixColIndex[iCol]);
+                }
+            }
         }
     }
 }
