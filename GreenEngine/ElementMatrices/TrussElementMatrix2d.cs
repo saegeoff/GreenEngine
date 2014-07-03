@@ -43,14 +43,14 @@ namespace GreenEngine.ElementMatrices
             double cs = c * s;
 
             m_Matrix [0, 0] = m_Matrix [2, 2] = ael * c2;
-            m_Matrix [1, 0] = m_Matrix [3, 2] = ael * cs;
             m_Matrix [0, 1] = m_Matrix [2, 3] = ael * cs;
-            m_Matrix [1, 1] = m_Matrix [3, 3] = ael * s2;
+            m_Matrix [0, 2] = m_Matrix [2, 0] = ael * -c2;
+            m_Matrix [0, 3] = m_Matrix [2, 1] = ael * -cs;
 
-            m_Matrix [2, 0] = m_Matrix [0, 2] = ael * -c2;
-            m_Matrix [3, 0] = m_Matrix [1, 2] = ael * -cs;
-            m_Matrix [2, 1] = m_Matrix [0, 3] = ael * -cs;
-            m_Matrix [3, 1] = m_Matrix [1, 3] = ael * -s2;
+            m_Matrix [1, 0] = m_Matrix [3, 2] = ael * cs;
+            m_Matrix [1, 1] = m_Matrix [3, 3] = ael * s2;
+            m_Matrix [1, 2] = m_Matrix [3, 0] = ael * -cs;
+            m_Matrix [1, 3] = m_Matrix [3, 1] = ael * -s2;
 
             m_E = e;
             m_L = l;
@@ -94,37 +94,44 @@ namespace GreenEngine.ElementMatrices
             return degreesOfFreedomList;
         }
 
-        protected override void CopyToMatrix(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> xDictionary, IDictionary<Tuple<int, DegreeType>, int> yDictionary)
+        protected override void CopyToMatrix(Matrix<double> globalMatrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary)
         {
             Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
             Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
             Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
             Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
 
-            int x1Index = xDictionary[x1Tuple];
-            int y1Index = yDictionary[y1Tuple];
-            int x2Index = xDictionary[x2Tuple];
-            int y2Index = yDictionary[y2Tuple];
+            int x1RowIndex = rowDictionary[x1Tuple];
+            int x1ColIndex = colDictionary[x1Tuple];
 
-            AddToGlobalMatrix(0, 0, x1Index, x1Index, globalMatrix);
-            AddToGlobalMatrix(1, 0, x1Index, y1Index, globalMatrix);
-            AddToGlobalMatrix(2, 0, x1Index, x2Index, globalMatrix);
-            AddToGlobalMatrix(3, 0, x1Index, y2Index, globalMatrix);
+            int y1RowIndex = rowDictionary[y1Tuple];
+            int y1ColIndex = colDictionary[y1Tuple];
 
-            AddToGlobalMatrix(0, 1, y1Index, x1Index, globalMatrix);
-            AddToGlobalMatrix(1, 1, y1Index, y1Index, globalMatrix);
-            AddToGlobalMatrix(2, 1, y1Index, x2Index, globalMatrix);
-            AddToGlobalMatrix(3, 1, y1Index, y2Index, globalMatrix);
+            int x2RowIndex = rowDictionary[x2Tuple];
+            int x2ColIndex = colDictionary[x2Tuple];
 
-            AddToGlobalMatrix(0, 2, x2Index, x1Index, globalMatrix);
-            AddToGlobalMatrix(1, 2, x2Index, y1Index, globalMatrix);
-            AddToGlobalMatrix(2, 2, x2Index, x2Index, globalMatrix);
-            AddToGlobalMatrix(3, 2, x2Index, y2Index, globalMatrix);
+            int y2RowIndex = rowDictionary[y2Tuple];
+            int y2ColIndex = colDictionary[y2Tuple];
 
-            AddToGlobalMatrix(0, 3, y2Index, x1Index, globalMatrix);
-            AddToGlobalMatrix(1, 3, y2Index, y1Index, globalMatrix);
-            AddToGlobalMatrix(2, 3, y2Index, x2Index, globalMatrix);
-            AddToGlobalMatrix(3, 3, y2Index, y2Index, globalMatrix);
+            AddToGlobalMatrix(0, 0, x1RowIndex, x1ColIndex, globalMatrix);
+            AddToGlobalMatrix(0, 1, x1RowIndex, y1ColIndex, globalMatrix);
+            AddToGlobalMatrix(0, 2, x1RowIndex, x2ColIndex, globalMatrix);
+            AddToGlobalMatrix(0, 3, x1RowIndex, y2ColIndex, globalMatrix);
+
+            AddToGlobalMatrix(1, 0, y1RowIndex, x1ColIndex, globalMatrix);
+            AddToGlobalMatrix(1, 1, y1RowIndex, y1ColIndex, globalMatrix);
+            AddToGlobalMatrix(1, 2, y1RowIndex, x2ColIndex, globalMatrix);
+            AddToGlobalMatrix(1, 3, y1RowIndex, y2ColIndex, globalMatrix);
+
+            AddToGlobalMatrix(2, 0, x2RowIndex, x1ColIndex, globalMatrix);
+            AddToGlobalMatrix(2, 1, x2RowIndex, y1ColIndex, globalMatrix);
+            AddToGlobalMatrix(2, 2, x2RowIndex, x2ColIndex, globalMatrix);
+            AddToGlobalMatrix(2, 3, x2RowIndex, y2ColIndex, globalMatrix);
+
+            AddToGlobalMatrix(3, 0, y2RowIndex, x1ColIndex, globalMatrix);
+            AddToGlobalMatrix(3, 1, y2RowIndex, y1ColIndex, globalMatrix);
+            AddToGlobalMatrix(3, 2, y2RowIndex, x2ColIndex, globalMatrix);
+            AddToGlobalMatrix(3, 3, y2RowIndex, y2ColIndex, globalMatrix);
         }
     }
 }

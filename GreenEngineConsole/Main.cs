@@ -9,7 +9,7 @@ namespace GreenEngineConsole
 	{
 		public static void Main (string[] args)
 		{
-            FiniteElementModel fem = GetModel3();
+            FiniteElementModel fem = GetModel2();
 
             LinearEngine2d engine = new LinearEngine2d();
             AnalysisResults results = engine.Analyze(fem);

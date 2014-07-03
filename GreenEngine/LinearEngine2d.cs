@@ -174,9 +174,10 @@ namespace GreenEngine
         protected void BuildSupportReactionsVector()
         {
             Matrix<double> supportGlobalStiffnessMatrix = new SparseMatrix(m_SupportDegreeOfFreedomSet.Count, m_AllDegreeOfFreedomSet.Count);
+
             foreach (ElementMatrix matrix in m_ElementMatrixList)
             {
-                //matrix.CopyToSupportMatrix(supportGlobalStiffnessMatrix, m_SupportGlobalIndexDictionary, m_AllGlobalIndexDictionary);
+                matrix.CopyToSupportMatrix(supportGlobalStiffnessMatrix, m_SupportGlobalIndexDictionary, m_AllGlobalIndexDictionary);
             }
 
             Vector<double> displacementVector = new SparseVector(m_AllDegreeOfFreedomSet.Count);
@@ -189,11 +190,7 @@ namespace GreenEngine
                     displacementVector[allGlobalIndex] = m_DisplacementsVector[globalIndex];
             }
 
-            //m_SupportReactionsVector = supportGlobalStiffnessMatrix.Multiply(displacementVector);
-
-            //Console.Write(supportGlobalStiffnessMatrix);
-
-            int y = 0;
+            m_SupportReactionsVector = supportGlobalStiffnessMatrix.Multiply(displacementVector);
         }
 
         protected AnalysisResults BuildResults()
@@ -205,8 +202,10 @@ namespace GreenEngine
             resultsBuilder.AllDegreeOfFreedomSet = m_AllDegreeOfFreedomSet;
             resultsBuilder.SupportDegreeOfFreedomSet = m_SupportDegreeOfFreedomSet;
             resultsBuilder.AllGlobalIndexDictionary = m_AllGlobalIndexDictionary;
+            resultsBuilder.SupportGlobalIndexDictionary = m_SupportGlobalIndexDictionary;
             resultsBuilder.GlobalIndexDictionary = m_GlobalIndexDictionary;
             resultsBuilder.DisplacementsVector = m_DisplacementsVector;
+            resultsBuilder.SupportReactionsVector = m_SupportReactionsVector;
 
             return resultsBuilder.BuildResults();
         }

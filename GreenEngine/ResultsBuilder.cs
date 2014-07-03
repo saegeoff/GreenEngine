@@ -4,6 +4,7 @@ using GreenEngine.Results;
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using GreenEngine.ElementMatrices;
+using System.Diagnostics;
 
 namespace GreenEngine
 {
@@ -14,9 +15,11 @@ namespace GreenEngine
         protected SortedSet<Tuple<int, DegreeType>> m_AllDegreeOfFreedomSet;
         protected SortedSet<Tuple<int, DegreeType>> m_SupportDegreeOfFreedomSet;
         protected Dictionary<Tuple<int, DegreeType>, int> m_AllGlobalIndexDictionary;
+        protected Dictionary<Tuple<int, DegreeType>, int> m_SupportGlobalIndexDictionary;
         protected Dictionary<Tuple<int, DegreeType>, int> m_GlobalIndexDictionary;
         protected Vector<double> m_DisplacementsVector;
         //protected Matrix<double> globalStiffnessMatrix;
+        protected Vector<double> m_SupportReactionsVector;
 
         public ResultsBuilder()
         {
@@ -58,10 +61,22 @@ namespace GreenEngine
             set { m_GlobalIndexDictionary = value; }
         }
 
+        public Dictionary<Tuple<int, DegreeType>, int> SupportGlobalIndexDictionary
+        { 
+            get { return m_SupportGlobalIndexDictionary; }
+            set { m_SupportGlobalIndexDictionary = value; }
+        }
+
         public Vector<double> DisplacementsVector
         { 
             get { return m_DisplacementsVector; }
             set { m_DisplacementsVector = value; }
+        }
+
+        public Vector<double> SupportReactionsVector
+        { 
+            get { return m_SupportReactionsVector; }
+            set { m_SupportReactionsVector = value; }
         }
 
         public AnalysisResults BuildResults()
@@ -161,7 +176,7 @@ namespace GreenEngine
 
         protected void PopulateSupportReactions(AnalysisResults results)
         {
-            int iNumSupportConstraints = 0;
+            //int iNumSupportConstraints = 0;
             Dictionary<int, SupportReaction> supportReactionDictionary = new Dictionary<int, SupportReaction>();
             foreach (Support support in m_Model.Supports)
             {
@@ -170,47 +185,32 @@ namespace GreenEngine
                 results.SupportReactions.Add(supportReaction);
                 supportReactionDictionary.Add(support.Node.NodeId, supportReaction);
 
-                iNumSupportConstraints += support.GetNumberOfConstraints();
+                //iNumSupportConstraints += support.GetNumberOfConstraints();
             }
 
-            //            Matrix<double> supportStiffnessMatrix = new SparseMatrix(fem.Nodes.Count * 2 /* nodes * xy(2) */, iNumSupportConstraints);
-            //
-            //
-            //            Vector<double> supportStiffnessDisplacements = new SparseVector(fem.Nodes.Count * 2 /* nodes * xy(2) */);
-            //
-            //            for (int i = 0; i < fem.Nodes.Count; i++)
-            //            {
-            //                Node node = fem.Nodes [i];
-            //
-            //                int xIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == node.NodeId && x.Item2 == DegreeType.X);
-            //                int yIndex = elementDegreeSolveList.FindIndex(x => x.Item1 == node.NodeId && x.Item2 == DegreeType.Y);
-            //
-            //                if (xIndex >= 0)
-            //                    supportStiffnessDisplacements [(i * 2)] = displacements [xIndex];
-            //                else
-            //                    supportStiffnessDisplacements [(i * 2)] = 0.0;
-            //
-            //                if (yIndex >= 0)
-            //                    supportStiffnessDisplacements [(i * 2) + 1] = displacements [yIndex];
-            //                else
-            //                    supportStiffnessDisplacements [(i * 2) + 1] = 0.0;
-            //            }
+            Debug.Assert(m_SupportDegreeOfFreedomSet.Count == m_SupportReactionsVector.Count);
 
-            //            SortedSet<Tuple<int, DegreeType>> elementSupportSolveSet = new SortedSet<Tuple<int, DegreeType>>(elementDegreeSet);
-            //
-            //
-            //            // Remove supports from degrees of freedom solve set
-            //            foreach (Support support in fem.Supports)
-            //            {
-            //                if (support.Tx == Support.TranslationType.Constrained)
-            //                    elementSupportSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.X));
-            //
-            //                if (support.Ty == Support.TranslationType.Constrained)
-            //                    elementSupportSolveSet.Remove(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
-            //            }
-            //
-            //            List<Tuple<int, DegreeType>> elementSupportSolveList = new List<Tuple<int, DegreeType>>(elementDegreeSolveSet);
+            foreach (Tuple<int, DegreeType> supportDegree in m_SupportDegreeOfFreedomSet)
+            {
+                int supportIndex = m_SupportGlobalIndexDictionary[supportDegree];
+                double reactionValue = m_SupportReactionsVector[supportIndex];
 
+                SupportReaction supportReaction = supportReactionDictionary[supportDegree.Item1];
+
+                if (supportDegree.Item2 == DegreeType.X)
+                {
+                    supportReaction.Rx = reactionValue;
+                }
+                else if (supportDegree.Item2 == DegreeType.Y)
+                {
+                    supportReaction.Ry = reactionValue;
+                }
+                else
+                {
+                    Debug.Assert(false);
+                    continue;
+                }
+            }
         }
     }
 }

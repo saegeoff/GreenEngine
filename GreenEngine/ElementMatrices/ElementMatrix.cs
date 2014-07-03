@@ -31,14 +31,14 @@ namespace GreenEngine.ElementMatrices
             CopyToMatrix(supportMatrix, allGlobalIndexDictionary, supportGlobalIndexDictionary);
         }
     
-        protected abstract void CopyToMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> xDictionary, IDictionary<Tuple<int, DegreeType>, int> yDictionary);
+        protected abstract void CopyToMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary);
 
-        protected void AddToGlobalMatrix(int lX, int lY, int gX, int gY, Matrix<double> globalMatrix)
+        protected void AddToGlobalMatrix(int lRow, int lCol, int gRow, int gCol, Matrix<double> globalMatrix)
         {
-            if (gX < 0 || gY < 0)
+            if (gRow < 0 || gCol < 0)
                 return;
 
-            globalMatrix [gX, gY] += m_Matrix [lX, lY]; 
+            globalMatrix [gRow, gCol] += m_Matrix [lRow, lCol]; 
         }
     }
 }
