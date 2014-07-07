@@ -99,10 +99,10 @@ namespace GreenEngineConsole.Tests
             {
                 if (reaction.NodeId == 1)
                 {
-                    if (!IsEqualTo(reaction.Ty, 5000.0))
+                    if (!IsEqualTo(reaction.Fy, 5000.0))
                         return false;
 
-                    if (!IsEqualTo(reaction.Rz, 600000.0))
+                    if (!IsEqualTo(reaction.Mz, 600000.0))
                         return false;
                 }
             }

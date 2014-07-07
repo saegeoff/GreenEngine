@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace GreenEngine.Results
 {
-    public class ElementStressCollection : IList<ElementStress>
+    public class ElementActionCollection : IList<ElementAction>
     {
-        IList<ElementStress> m_Data = new List<ElementStress>();
+        IList<ElementAction> m_Data = new List<ElementAction>();
         
-        public ElementStressCollection()
+        public ElementActionCollection()
         {
         }
         
-        public int IndexOf(ElementStress item)
+        public int IndexOf(ElementAction item)
         {
             return m_Data.IndexOf(item);
         }
         
-        public void Insert(int index, ElementStress item)
+        public void Insert(int index, ElementAction item)
         {
             m_Data.Insert(index, item);
         }
@@ -26,7 +26,7 @@ namespace GreenEngine.Results
             m_Data.RemoveAt(index);
         }
         
-        public ElementStress this[int index]
+        public ElementAction this[int index]
         {
             get
             {
@@ -38,7 +38,7 @@ namespace GreenEngine.Results
             }
         }
         
-        public void Add(ElementStress item)
+        public void Add(ElementAction item)
         {
             m_Data.Add(item);
         }
@@ -48,12 +48,12 @@ namespace GreenEngine.Results
             m_Data.Clear();
         }
         
-        public bool Contains(ElementStress item)
+        public bool Contains(ElementAction item)
         {
             return m_Data.Contains(item);
         }
         
-        public void CopyTo(ElementStress[] array, int arrayIndex)
+        public void CopyTo(ElementAction[] array, int arrayIndex)
         {
             m_Data.CopyTo(array, arrayIndex);
         }
@@ -68,12 +68,12 @@ namespace GreenEngine.Results
             get { return m_Data.IsReadOnly; }
         }
         
-        public bool Remove(ElementStress item)
+        public bool Remove(ElementAction item)
         {
             return m_Data.Remove(item);
         }
         
-        public IEnumerator<ElementStress> GetEnumerator()
+        public IEnumerator<ElementAction> GetEnumerator()
         {
             return m_Data.GetEnumerator();
         }

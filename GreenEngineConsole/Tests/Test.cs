@@ -19,6 +19,11 @@ namespace GreenEngineConsole.Tests
             get { return m_TestName; }
         }
 
+        public AnalysisResults Results
+        {
+            get { return m_Results; }
+        }
+
         public abstract bool Run();
 
         public void OutputResults()
@@ -33,9 +38,9 @@ namespace GreenEngineConsole.Tests
             Console.WriteLine();
 
             Console.WriteLine("Element Stresses:");
-            foreach (ElementStress stress in m_Results.ElementStresses)
+            foreach (ElementAction action in m_Results.ElementActions)
             {
-                Console.WriteLine(stress);
+                Console.WriteLine(action);
             }
             Console.WriteLine();
             Console.WriteLine();

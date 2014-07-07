@@ -4,6 +4,7 @@ using GreenEngine;
 using GreenEngine.Results;
 using GreenEngineConsole.Tests;
 using System.Collections.Generic;
+using GreenEngine.Output;
 
 namespace GreenEngineConsole
 {
@@ -26,6 +27,8 @@ namespace GreenEngineConsole
             testList.Add(new BeamTest1());
             testList.Add(new BeamTest2());
 
+            int iId = 0;
+
             foreach (Test test in testList)
             {
                 Console.Write(test.Name + ": ");
@@ -36,6 +39,8 @@ namespace GreenEngineConsole
                     Console.WriteLine("Passed...");
                 else
                     Console.WriteLine("Failed...");
+
+                //TextReport report = new TextReport(test.Results, string.Format("/home/gtrees/{0}.txt", ++iId));
             }
         }
 	}

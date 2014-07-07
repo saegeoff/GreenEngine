@@ -61,18 +61,20 @@
     <Compile Include="DegreeType.cs" />
     <Compile Include="Results\AnalysisResults.cs" />
     <Compile Include="MasterMatrices\GlobalMatrix.cs" />
-    <Compile Include="Results\ElementStressCollection.cs" />
-    <Compile Include="Results\ElementStress.cs" />
     <Compile Include="Results\SupportReaction.cs" />
     <Compile Include="Results\SupportReactionCollection.cs" />
     <Compile Include="ResultsBuilder.cs" />
     <Compile Include="Model\ConcentratedNodalLoad.cs" />
     <Compile Include="ElementMatrices\BeamElementMatrix2d.cs" />
+    <Compile Include="Output\TextReport.cs" />
+    <Compile Include="Results\ElementAction.cs" />
+    <Compile Include="Results\ElementActionCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Results\" />
     <Folder Include="MasterMatrices\" />
+    <Folder Include="Output\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

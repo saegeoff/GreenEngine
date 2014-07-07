@@ -108,17 +108,17 @@ namespace GreenEngineConsole.Tests
                 }
             }
 
-            foreach (ElementStress stress in m_Results.ElementStresses)
+            foreach (ElementAction action in m_Results.ElementActions)
             {
-                if (stress.ElementId == 1)
+                if (action.ElementId == 1)
                 {
-                    if (!IsEqualTo(stress.Stress, 10000.0))
+                    if (!IsEqualTo(action.Stress, 10000.0))
                         return false;
                 }
 
-                if (stress.ElementId == 2)
+                if (action.ElementId == 2)
                 {
-                    if (!IsEqualTo(stress.Stress, 10000.0))
+                    if (!IsEqualTo(action.Stress, 10000.0))
                         return false;
                 }
             }
@@ -127,19 +127,19 @@ namespace GreenEngineConsole.Tests
             {
                 if (reaction.NodeId == 1)
                 {
-                    if (!IsEqualTo(reaction.Tx, -4330.12702))
+                    if (!IsEqualTo(reaction.Fx, -4330.12702))
                         return false;
 
-                    if (!IsEqualTo(reaction.Ty, 2500.0))
+                    if (!IsEqualTo(reaction.Fy, 2500.0))
                         return false;
                 }
 
                 if (reaction.NodeId == 3)
                 {
-                    if (!IsEqualTo(reaction.Tx, 4330.12702))
+                    if (!IsEqualTo(reaction.Fx, 4330.12702))
                         return false;
 
-                    if (!IsEqualTo(reaction.Ty, 2500.0))
+                    if (!IsEqualTo(reaction.Fy, 2500.0))
                         return false;
                 }
             }

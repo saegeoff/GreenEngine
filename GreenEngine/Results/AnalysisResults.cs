@@ -5,7 +5,7 @@ namespace GreenEngine.Results
     public class AnalysisResults
     {
         protected NodalDisplacementCollection m_NodalDisplacementCollection = new NodalDisplacementCollection();
-        protected ElementStressCollection m_ElementStressCollection = new ElementStressCollection();
+        protected ElementActionCollection m_ElementStressCollection = new ElementActionCollection();
         protected SupportReactionCollection m_SupportReactionCollection = new SupportReactionCollection();
 
         public AnalysisResults()
@@ -17,7 +17,7 @@ namespace GreenEngine.Results
             get { return m_NodalDisplacementCollection; }
         }
 
-        public ElementStressCollection ElementStresses
+        public ElementActionCollection ElementActions
         {
             get { return m_ElementStressCollection; }
         }

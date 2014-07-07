@@ -128,12 +128,12 @@ namespace GreenEngine
 
         protected void PopulateStresses(AnalysisResults results)
         {
-            Dictionary<int, ElementStress> stressDictionary = new Dictionary<int, ElementStress>();
+            Dictionary<int, ElementAction> stressDictionary = new Dictionary<int, ElementAction>();
             foreach (Element element in m_Model.Elements)
             {
-                ElementStress stress = new ElementStress();
+                ElementAction stress = new ElementAction();
                 stress.ElementId = element.ElementId;
-                results.ElementStresses.Add(stress);
+                results.ElementActions.Add(stress);
                 stressDictionary.Add(element.ElementId, stress);  
             }
 
@@ -142,7 +142,7 @@ namespace GreenEngine
                 if (matrix is TrussElementMatrix2d)
                 {
                     TrussElementMatrix2d trussMatrix = (TrussElementMatrix2d)matrix;
-                    ElementStress stress = stressDictionary [trussMatrix.ElementId];
+                    ElementAction stress = stressDictionary [trussMatrix.ElementId];
 
                     double q1 = 0.0;
                     double q2 = 0.0;
@@ -199,15 +199,15 @@ namespace GreenEngine
 
                 if (supportDegree.Item2 == DegreeType.Fx)
                 {
-                    supportReaction.Tx = reactionValue;
+                    supportReaction.Fx = reactionValue;
                 }
                 else if (supportDegree.Item2 == DegreeType.Fy)
                 {
-                    supportReaction.Ty = reactionValue;
+                    supportReaction.Fy = reactionValue;
                 }
                 else if (supportDegree.Item2 == DegreeType.Mz)
                 {
-                    supportReaction.Rz = reactionValue;
+                    supportReaction.Mz = reactionValue;
                 }
                 else
                 {

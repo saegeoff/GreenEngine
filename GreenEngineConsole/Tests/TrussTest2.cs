@@ -148,29 +148,29 @@ namespace GreenEngineConsole.Tests
                 }
             }
 
-            foreach (ElementStress stress in m_Results.ElementStresses)
+            foreach (ElementAction action in m_Results.ElementActions)
             {
-                if (stress.ElementId == 1)
+                if (action.ElementId == 1)
                 {
-                    if (!IsEqualTo(stress.Stress, 20000.0))
+                    if (!IsEqualTo(action.Stress, 20000.0))
                         return false;
                 }
 
-                if (stress.ElementId == 2)
+                if (action.ElementId == 2)
                 {
-                    if (!IsEqualTo(stress.Stress, -21875.0))
+                    if (!IsEqualTo(action.Stress, -21875.0))
                         return false;
                 }
 
-                if (stress.ElementId == 3)
+                if (action.ElementId == 3)
                 {
-                    if (!IsEqualTo(stress.Stress, -5208.33333))
+                    if (!IsEqualTo(action.Stress, -5208.33333))
                         return false;
                 }
 
-                if (stress.ElementId == 4)
+                if (action.ElementId == 4)
                 {
-                    if (!IsEqualTo(stress.Stress, 4166.66667))
+                    if (!IsEqualTo(action.Stress, 4166.66667))
                         return false;
                 }
             }
@@ -179,25 +179,25 @@ namespace GreenEngineConsole.Tests
             {
                 if (reaction.NodeId == 1)
                 {
-                    if (!IsEqualTo(reaction.Tx, -15833.33333))
+                    if (!IsEqualTo(reaction.Fx, -15833.33333))
                         return false;
 
-                    if (!IsEqualTo(reaction.Ty, 3125.0))
+                    if (!IsEqualTo(reaction.Fy, 3125.0))
                         return false;
                 }
 
                 if (reaction.NodeId == 2)
                 {
-                    if (!IsEqualTo(reaction.Ty, 21875.0))
+                    if (!IsEqualTo(reaction.Fy, 21875.0))
                         return false;
                 }
 
                 if (reaction.NodeId == 4)
                 {
-                    if (!IsEqualTo(reaction.Tx, -4166.66667))
+                    if (!IsEqualTo(reaction.Fx, -4166.66667))
                         return false;
 
-                    if (!IsEqualTo(reaction.Ty, 0.0))
+                    if (!IsEqualTo(reaction.Fy, 0.0))
                         return false;
                 }
             }

@@ -2,9 +2,9 @@ using System;
 
 namespace GreenEngine.Results
 {
-    public class ElementStress
+    public class ElementAction
     {
-        public ElementStress()
+        public ElementAction()
         {
             ElementId = -1;
             Stress = 0.0;
