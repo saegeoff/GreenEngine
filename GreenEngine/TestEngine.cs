@@ -31,10 +31,10 @@ namespace GreenEngine
 
             foreach (Support support in fem.Supports)
             {
-                if (support.Tx == Support.TranslationType.Constrained)
+                if (support.Tx == TranslationType.Constrained)
                     degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
 
-                if (support.Ty == Support.TranslationType.Constrained)
+                if (support.Ty == TranslationType.Constrained)
                     degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
             }
            

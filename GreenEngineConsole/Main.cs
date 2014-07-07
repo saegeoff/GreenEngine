@@ -14,6 +14,12 @@ namespace GreenEngineConsole
 		{
             RunAllTests();
 
+            //BeamTest2 test = new BeamTest2();
+            //test.Run();
+            //test.OutputResults();
+
+            //TextReport report = new TextReport(test.Results, "D:\\output.txt");
+
             Console.ReadKey();
 		}
 

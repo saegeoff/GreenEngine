@@ -45,12 +45,12 @@ namespace GreenEngineConsole.Tests
             m_Model.Nodes.Add(node3);
 
             Support support1 = new Support();
-            support1.Tx = Support.TranslationType.Constrained;
-            support1.Ty = Support.TranslationType.Constrained;
+            support1.Tx = TranslationType.Constrained;
+            support1.Ty = TranslationType.Constrained;
             support1.Node = node1;
 
             Support support2 = new Support();
-            support2.Ty = Support.TranslationType.Constrained;
+            support2.Ty = TranslationType.Constrained;
             support2.Node = node2;
 
             m_Model.Supports.Add(support1);

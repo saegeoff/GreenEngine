@@ -8,18 +8,6 @@ namespace GreenEngine.Model
 {
     public class Support
     {
-        public enum TranslationType
-        {
-            Constrained,
-            Released
-        }
-
-        public enum RotationType
-        {
-            Constrained,
-            Released
-        }
-        
         public Support()
 		{
             Tx = TranslationType.Released;

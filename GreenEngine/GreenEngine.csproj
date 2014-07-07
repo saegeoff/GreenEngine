@@ -58,7 +58,6 @@
     <Compile Include="ElementMatrices\TrussElementMatrix2d.cs" />
     <Compile Include="Results\NodalDisplacement.cs" />
     <Compile Include="Results\NodalDisplacementCollection.cs" />
-    <Compile Include="DegreeType.cs" />
     <Compile Include="Results\AnalysisResults.cs" />
     <Compile Include="MasterMatrices\GlobalMatrix.cs" />
     <Compile Include="Results\SupportReaction.cs" />
@@ -69,6 +68,7 @@
     <Compile Include="Output\TextReport.cs" />
     <Compile Include="Results\ElementAction.cs" />
     <Compile Include="Results\ElementActionCollection.cs" />
+    <Compile Include="SystemTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

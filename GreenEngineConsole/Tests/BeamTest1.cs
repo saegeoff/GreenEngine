@@ -39,9 +39,9 @@ namespace GreenEngineConsole.Tests
             m_Model.Nodes.Add(node2);
 
             Support support1 = new Support();
-            support1.Tx = Support.TranslationType.Constrained;
-            support1.Ty = Support.TranslationType.Constrained;
-            support1.Rz = Support.RotationType.Constrained;
+            support1.Tx = TranslationType.Constrained;
+            support1.Ty = TranslationType.Constrained;
+            support1.Rz = RotationType.Constrained;
             support1.Node = node1;
 
             m_Model.Supports.Add(support1);

@@ -103,13 +103,13 @@ namespace GreenEngine
         {
             foreach (Support support in m_Model.Supports)
             {
-                if (support.Tx == Support.TranslationType.Constrained)
+                if (support.Tx == TranslationType.Constrained)
                     m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
 
-                if (support.Ty == Support.TranslationType.Constrained)
+                if (support.Ty == TranslationType.Constrained)
                     m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
 
-                if (support.Rz == Support.RotationType.Constrained)
+                if (support.Rz == RotationType.Constrained)
                     m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Mz));
             }
         }
