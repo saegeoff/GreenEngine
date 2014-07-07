@@ -65,12 +65,9 @@ namespace GreenEngine
             BuildSupportReactionsVector();
 
             // debugging
-            Console.WriteLine(m_GlobalStiffnessMatrix.ToString());
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(m_LoadsVector.ToString());
-            Console.WriteLine();
-            Console.WriteLine();
+            //Console.WriteLine(m_GlobalStiffnessMatrix.ToString());
+            //Console.WriteLine(m_LoadsVector.ToString());
+            //Console.WriteLine(m_DisplacementsVector.ToString());
 
             // Build Results
             return BuildResults();
@@ -87,13 +84,17 @@ namespace GreenEngine
                 {
                     elementMatrix = new TrussElementMatrix2d((TrussElement)element);
                 }
+                else if (element is BeamElement)
+                {
+                    elementMatrix = new BeamElementMatrix2d((BeamElement)element);
+                }
                 else
                 {
                     System.Diagnostics.Debug.Assert(false);
                     continue;
                 }
 
-                m_AllDegreeOfFreedomSet.UnionWith(elementMatrix.GetDegreesOfFreedom());
+                m_AllDegreeOfFreedomSet.UnionWith(elementMatrix.GetDegreesOfFreedomTupleList());
                 m_ElementMatrixList.Add(elementMatrix);
             }
         }
@@ -103,10 +104,13 @@ namespace GreenEngine
             foreach (Support support in m_Model.Supports)
             {
                 if (support.Tx == Support.TranslationType.Constrained)
-                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.X));
+                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
 
                 if (support.Ty == Support.TranslationType.Constrained)
-                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
+                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
+
+                if (support.Rz == Support.RotationType.Constrained)
+                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Mz));
             }
         }
 
@@ -134,7 +138,14 @@ namespace GreenEngine
 
         protected void BuildGlobalStiffnessMatrix()
         {
-            int iMatrixDimensionSize = m_AllDegreeOfFreedomSet.Count - m_SupportDegreeOfFreedomSet.Count;
+            int iMatrixDimensionSize = m_AllDegreeOfFreedomSet.Count;
+
+            foreach (Tuple<int, DegreeType> tuple in m_SupportDegreeOfFreedomSet)
+            {
+                if (m_AllDegreeOfFreedomSet.Contains(tuple))
+                    --iMatrixDimensionSize;
+            }
+
             m_GlobalStiffnessMatrix = new SparseMatrix(iMatrixDimensionSize, iMatrixDimensionSize);
             foreach (ElementMatrix matrix in m_ElementMatrixList)
             {
@@ -144,7 +155,14 @@ namespace GreenEngine
 
         protected void BuildLoadsVector()
         {
-            int iVectorDimensionSize = m_AllDegreeOfFreedomSet.Count - m_SupportDegreeOfFreedomSet.Count;
+            int iVectorDimensionSize = m_AllDegreeOfFreedomSet.Count;
+
+            foreach (Tuple<int, DegreeType> tuple in m_SupportDegreeOfFreedomSet)
+            {
+                if (m_AllDegreeOfFreedomSet.Contains(tuple))
+                    --iVectorDimensionSize;
+            }
+
             m_LoadsVector = new SparseVector(iVectorDimensionSize);
             foreach (Load load in m_Model.Loads)
             {
@@ -152,11 +170,17 @@ namespace GreenEngine
                 {
                     ConcentratedNodalLoad conLoad = (ConcentratedNodalLoad)load;
 
-                    Tuple<int, DegreeType> xTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.X);
-                    Tuple<int, DegreeType> yTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.Y);
+                    Tuple<int, DegreeType> xTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.Fx);
+                    Tuple<int, DegreeType> yTuple = new Tuple<int, DegreeType>(conLoad.Node.NodeId, DegreeType.Fy);
 
-                    int xIndex = m_GlobalIndexDictionary[xTuple];
-                    int yIndex = m_GlobalIndexDictionary[yTuple];
+                    int xIndex = -1;
+                    int yIndex = -1;
+
+                    if (m_GlobalIndexDictionary.ContainsKey(xTuple))
+                        xIndex = m_GlobalIndexDictionary[xTuple];
+
+                    if (m_GlobalIndexDictionary.ContainsKey(yTuple))
+                        yIndex = m_GlobalIndexDictionary[yTuple];
 
                     if (xIndex >= 0)
                     {

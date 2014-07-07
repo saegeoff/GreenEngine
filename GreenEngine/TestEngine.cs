@@ -23,19 +23,19 @@ namespace GreenEngine
 			// for now just do X and Y for truss * nodes
             foreach (Node node in fem.Nodes)
             {
-                degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
-                degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
-                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.X));
-                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Y));
+                degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Fx));
+                degreeSet.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Fy));
+                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Fx));
+                degreeListSolve.Add(Tuple.Create<int, DegreeType>(node.NodeId, DegreeType.Fy));
             }
 
             foreach (Support support in fem.Supports)
             {
                 if (support.Tx == Support.TranslationType.Constrained)
-                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.X));
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
 
                 if (support.Ty == Support.TranslationType.Constrained)
-                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Y));
+                    degreeListSolve.Remove(Tuple.Create<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
             }
            
             Matrix<double> m = new SparseMatrix(degreeListSolve.Count, degreeListSolve.Count);
@@ -57,8 +57,8 @@ namespace GreenEngine
                 {
                     ConcentratedNodalLoad conLoad = (ConcentratedNodalLoad)load;
 
-                    int x1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.X);
-                    int y1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Y);
+                    int x1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Fx);
+                    int y1Index = degreeListSolve.FindIndex(x => x.Item1 == conLoad.Node.NodeId && x.Item2 == DegreeType.Fy);
 
                     if (x1Index >= 0)
                         loads[x1Index] += conLoad.X;
@@ -98,10 +98,10 @@ namespace GreenEngine
             double s2 = s * s;
             double sc = s * c;
 
-            int x1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.X);
-            int y1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.Y);
-            int x2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.X);
-            int y2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.Y);
+            int x1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.Fx);
+            int y1Index = list.FindIndex(x => x.Item1 == element.Node1.NodeId && x.Item2 == DegreeType.Fy);
+            int x2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.Fx);
+            int y2Index = list.FindIndex(x => x.Item1 == element.Node2.NodeId && x.Item2 == DegreeType.Fy);
 
 
             // Row 1

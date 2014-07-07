@@ -9,22 +9,24 @@ namespace GreenEngine.ElementMatrices
     {
         protected int m_NodeId1 = -1;
         protected int m_NodeId2 = -1;
-        protected int m_ElementId = -1;
 
         protected double m_E = 0.0;
         protected double m_L = 0.0;
         protected double m_S = 0.0;
         protected double m_C = 0.0;
         
-        public TrussElementMatrix2d(TrussElement element) :
-            base()
+        public TrussElementMatrix2d(TrussElement element)
+            : base(element)
         {
-            m_DegreesOfFreedom = 4;
-            m_Matrix = new double[m_DegreesOfFreedom, m_DegreesOfFreedom];
-
             m_NodeId1 = element.Node1.NodeId;
             m_NodeId2 = element.Node2.NodeId;
-            m_ElementId = element.ElementId;
+
+            m_DegreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Fx));
+            m_DegreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Fy));
+            m_DegreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Fx));
+            m_DegreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Fy));
+
+            m_Matrix = new double[m_DegreesOfFreedomList.Count, m_DegreesOfFreedomList.Count];
 
             double a = element.Area;
             double e = element.Material.ElasticModulus;
@@ -82,48 +84,7 @@ namespace GreenEngine.ElementMatrices
             get { return m_ElementId; }
         }
 
-        public override IEnumerable<Tuple<int, DegreeType>> GetDegreesOfFreedom()
-        {
-            List<Tuple<int, DegreeType>> degreesOfFreedomList = new List<Tuple<int, DegreeType>>();
 
-            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X));
-            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y));
-            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X));
-            degreesOfFreedomList.Add(new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y));
-
-            return degreesOfFreedomList;
-        }
-
-        protected override void CopyToMatrix(Matrix<double> matrix, IDictionary<Tuple<int, DegreeType>, int> rowDictionary, IDictionary<Tuple<int, DegreeType>, int> colDictionary)
-        {
-            Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.X);
-            Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(m_NodeId1, DegreeType.Y);
-            Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.X);
-            Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(m_NodeId2, DegreeType.Y);
-
-            int[] matrixRowIndex = new int[4];
-            int[] matrixColIndex = new int[4];
-
-            matrixRowIndex[0] = rowDictionary[x1Tuple];
-            matrixColIndex[0] = colDictionary[x1Tuple];
-
-            matrixRowIndex[1] = rowDictionary[y1Tuple];
-            matrixColIndex[1] = colDictionary[y1Tuple];
-
-            matrixRowIndex[2] = rowDictionary[x2Tuple];
-            matrixColIndex[2] = colDictionary[x2Tuple];
-
-            matrixRowIndex[3] = rowDictionary[y2Tuple];
-            matrixColIndex[3] = colDictionary[y2Tuple];
-
-            for (int iRow = 0; iRow < 4; ++iRow)
-            {
-                for (int iCol = 0; iCol < 4; ++iCol)
-                {
-                    AddToMatrix(matrix, iRow, iCol, matrixRowIndex[iRow], matrixColIndex[iCol]);
-                }
-            }
-        }
     }
 }
 

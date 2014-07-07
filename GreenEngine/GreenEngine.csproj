@@ -67,6 +67,7 @@
     <Compile Include="Results\SupportReactionCollection.cs" />
     <Compile Include="ResultsBuilder.cs" />
     <Compile Include="Model\ConcentratedNodalLoad.cs" />
+    <Compile Include="ElementMatrices\BeamElementMatrix2d.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

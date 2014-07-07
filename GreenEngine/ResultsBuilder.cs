@@ -114,10 +114,12 @@ namespace GreenEngine
                 {
                     NodalDisplacement displacement = displacementDictionary[degree.Item1];
 
-                    if (degree.Item2 == DegreeType.X)
-                        displacement.X = m_DisplacementsVector[index];
-                    else if (degree.Item2 == DegreeType.Y)
-                        displacement.Y = m_DisplacementsVector[index];
+                    if (degree.Item2 == DegreeType.Fx)
+                        displacement.Tx = m_DisplacementsVector[index];
+                    else if (degree.Item2 == DegreeType.Fy)
+                        displacement.Ty = m_DisplacementsVector[index];
+                    else if (degree.Item2 == DegreeType.Mz)
+                        displacement.Rz = m_DisplacementsVector[index];
                     else
                         System.Diagnostics.Debug.Assert(false);
                 }
@@ -147,10 +149,10 @@ namespace GreenEngine
                     double q3 = 0.0;
                     double q4 = 0.0;
 
-                    Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId1, DegreeType.X);
-                    Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId1, DegreeType.Y);
-                    Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.X);
-                    Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Y);
+                    Tuple<int, DegreeType> x1Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId1, DegreeType.Fx);
+                    Tuple<int, DegreeType> y1Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId1, DegreeType.Fy);
+                    Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Fx);
+                    Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Fy);
 
                     int q1Index = m_GlobalIndexDictionary[x1Tuple];
                     int q2Index = m_GlobalIndexDictionary[y1Tuple];
@@ -176,7 +178,6 @@ namespace GreenEngine
 
         protected void PopulateSupportReactions(AnalysisResults results)
         {
-            //int iNumSupportConstraints = 0;
             Dictionary<int, SupportReaction> supportReactionDictionary = new Dictionary<int, SupportReaction>();
             foreach (Support support in m_Model.Supports)
             {
@@ -184,26 +185,29 @@ namespace GreenEngine
                 supportReaction.NodeId = support.Node.NodeId;
                 results.SupportReactions.Add(supportReaction);
                 supportReactionDictionary.Add(support.Node.NodeId, supportReaction);
-
-                //iNumSupportConstraints += support.GetNumberOfConstraints();
             }
-
-            Debug.Assert(m_SupportDegreeOfFreedomSet.Count == m_SupportReactionsVector.Count);
 
             foreach (Tuple<int, DegreeType> supportDegree in m_SupportDegreeOfFreedomSet)
             {
+                if (!m_SupportGlobalIndexDictionary.ContainsKey(supportDegree))
+                    continue;
+
                 int supportIndex = m_SupportGlobalIndexDictionary[supportDegree];
                 double reactionValue = m_SupportReactionsVector[supportIndex];
 
                 SupportReaction supportReaction = supportReactionDictionary[supportDegree.Item1];
 
-                if (supportDegree.Item2 == DegreeType.X)
+                if (supportDegree.Item2 == DegreeType.Fx)
                 {
-                    supportReaction.Rx = reactionValue;
+                    supportReaction.Tx = reactionValue;
                 }
-                else if (supportDegree.Item2 == DegreeType.Y)
+                else if (supportDegree.Item2 == DegreeType.Fy)
                 {
-                    supportReaction.Ry = reactionValue;
+                    supportReaction.Ty = reactionValue;
+                }
+                else if (supportDegree.Item2 == DegreeType.Mz)
+                {
+                    supportReaction.Rz = reactionValue;
                 }
                 else
                 {

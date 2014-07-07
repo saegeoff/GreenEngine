@@ -4,7 +4,11 @@ namespace GreenEngine
 {
     public enum DegreeType
     {
-        X,
-        Y
+        Fx,
+        Fy,
+        Fz,
+        Mx,
+        My,
+        Mz,
     }
 }

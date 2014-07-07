@@ -6,12 +6,15 @@ namespace GreenEngine.Model
 	{
 		public BeamElement ()
 		{
+            MomentOfInertia = 0.0;
 		}
 
-		public Node Node1;
-		public Node Node2;
+        public Node Node1 { get; set; }
+        public Node Node2 { get; set; }
 
-		public Material Material;
+        public Material Material { get; set; }
+
+        public double MomentOfInertia { get; set; }
 	}
 }
 

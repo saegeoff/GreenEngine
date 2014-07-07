@@ -33,6 +33,12 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Tests\Test.cs" />
+    <Compile Include="Tests\TrussTest2.cs" />
+    <Compile Include="Tests\BeamTest1.cs" />
+    <Compile Include="Tests\TrussTest1.cs" />
+    <Compile Include="Tests\TrussTest3.cs" />
+    <Compile Include="Tests\BeamTest2.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -40,5 +46,8 @@
       <Project>{6FB5CA0F-A762-43BF-82D2-57923314F802}</Project>
       <Name>GreenEngine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tests\" />
   </ItemGroup>
 </Project>

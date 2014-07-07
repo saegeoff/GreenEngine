@@ -8,7 +8,6 @@ namespace GreenEngine.Model
     public class TrussElement : Element
     {
         public TrussElement()
-            : base()
         {
             Area = 0.0;
         }
