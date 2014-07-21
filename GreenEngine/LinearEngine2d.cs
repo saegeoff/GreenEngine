@@ -22,18 +22,7 @@ namespace GreenEngine
     public class LinearEngine2d
 	{
         protected FiniteElementModel m_Model;
-
-        List<ElementMatrix> m_ElementMatrixList = new List<ElementMatrix>();
-        SortedSet<Tuple<int, DegreeType>> m_AllDegreeOfFreedomSet = new SortedSet<Tuple<int, DegreeType>>();
-        SortedSet<Tuple<int, DegreeType>> m_SupportDegreeOfFreedomSet = new SortedSet<Tuple<int, DegreeType>>();
-        Dictionary<Tuple<int, DegreeType>, int> m_AllGlobalIndexDictionary = new Dictionary<Tuple<int, DegreeType>, int>();
-        Dictionary<Tuple<int, DegreeType>, int> m_SupportGlobalIndexDictionary = new Dictionary<Tuple<int, DegreeType>, int>();
-        Dictionary<Tuple<int, DegreeType>, int> m_GlobalIndexDictionary = new Dictionary<Tuple<int, DegreeType>, int>();
-
-        Matrix<double> m_GlobalStiffnessMatrix;
-        Vector<double> m_LoadsVector;
-        Vector<double> m_DisplacementsVector;
-        Vector<double> m_SupportReactionsVector;
+        private AnalysisDomain m_Domain; 
 
         public LinearEngine2d()
 		{
@@ -42,13 +31,7 @@ namespace GreenEngine
         public AnalysisResults Analyze(FiniteElementModel model)
 		{
             m_Model = model;
-
-            m_ElementMatrixList.Clear();
-            m_AllDegreeOfFreedomSet.Clear();
-            m_SupportDegreeOfFreedomSet.Clear();
-            m_AllGlobalIndexDictionary.Clear();
-            m_SupportGlobalIndexDictionary.Clear();
-            m_GlobalIndexDictionary.Clear();
+            m_Domain = new AnalysisDomain();
 
             // Build local stiffness matrix for each element
             BuildLocalStiffnessMatricies();
@@ -59,6 +42,9 @@ namespace GreenEngine
             // Build global index dictionaries
             BuildGlobalIndexDictionaries();
 
+            // Create Matrix and Vector
+            CreateDomainMatrixVector();
+
             // Build Global Stiffness Matrix
             BuildGlobalStiffnessMatrix();
 
@@ -66,7 +52,7 @@ namespace GreenEngine
             BuildLoadsVector();
 
             // Solve problem
-            m_DisplacementsVector = m_GlobalStiffnessMatrix.Solve(m_LoadsVector);
+            m_Domain.Solve();
 
             // Compute Stresses -- Need to pull this out of results gen
 
@@ -79,7 +65,14 @@ namespace GreenEngine
             //Console.WriteLine(m_DisplacementsVector.ToString());
 
             // Build Results
-            return BuildResults();
+            AnalysisResults results = BuildResults();
+
+            // Dereference model and domain
+            m_Model = null;
+            m_Domain = null;
+
+            // Return results
+            return results;
         }
 
         protected void BuildLocalStiffnessMatricies()
@@ -103,23 +96,25 @@ namespace GreenEngine
                     continue;
                 }
 
-                m_AllDegreeOfFreedomSet.UnionWith(elementMatrix.GetDegreesOfFreedomTupleList());
-                m_ElementMatrixList.Add(elementMatrix);
+                m_Domain.AllDegreeOfFreedomSet.UnionWith(elementMatrix.GetDegreesOfFreedomTupleList());
+                m_Domain.ElementMatrixList.Add(elementMatrix);
             }
         }
 
         protected void BuildSupportDegreesOfFreedomSet()
         {
+            // For 2D we just need Tx, Ty and Rz
+
             foreach (Support support in m_Model.Supports)
             {
                 if (support.Tx == TranslationType.Constrained)
-                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
+                    m_Domain.SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fx));
 
                 if (support.Ty == TranslationType.Constrained)
-                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
+                    m_Domain.SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Fy));
 
                 if (support.Rz == RotationType.Constrained)
-                    m_SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Mz));
+                    m_Domain.SupportDegreeOfFreedomSet.Add(new Tuple<int, DegreeType>(support.Node.NodeId, DegreeType.Mz));
             }
         }
 
@@ -128,51 +123,46 @@ namespace GreenEngine
             int iGlobalPosition = 0;
             int iSupportGlobalPosition = 0;
             int iAllGlobalPosition = 0;
-            foreach (Tuple<int, DegreeType> dof in m_AllDegreeOfFreedomSet)
+            foreach (Tuple<int, DegreeType> dof in m_Domain.AllDegreeOfFreedomSet)
             {
-                if (!m_SupportDegreeOfFreedomSet.Contains(dof))
+                if (!m_Domain.SupportDegreeOfFreedomSet.Contains(dof))
                 {
-                    m_GlobalIndexDictionary.Add(dof, iGlobalPosition++);
-                    m_SupportGlobalIndexDictionary.Add(dof, -1);
+                    m_Domain.GlobalIndexDictionary.Add(dof, iGlobalPosition++);
+                    m_Domain.SupportGlobalIndexDictionary.Add(dof, -1);
                 } 
                 else
                 {
-                    m_GlobalIndexDictionary.Add(dof, -1);
-                    m_SupportGlobalIndexDictionary.Add(dof, iSupportGlobalPosition++);
+                    m_Domain.GlobalIndexDictionary.Add(dof, -1);
+                    m_Domain.SupportGlobalIndexDictionary.Add(dof, iSupportGlobalPosition++);
                 }
 
-                m_AllGlobalIndexDictionary.Add(dof, iAllGlobalPosition++);
+                m_Domain.AllGlobalIndexDictionary.Add(dof, iAllGlobalPosition++);
             }
+        }
+
+        protected void CreateDomainMatrixVector()
+        {
+            int iSize = m_Domain.AllDegreeOfFreedomSet.Count;
+
+            foreach (Tuple<int, DegreeType> tuple in m_Domain.SupportDegreeOfFreedomSet)
+            {
+                if (m_Domain.AllDegreeOfFreedomSet.Contains(tuple))
+                    --iSize;
+            }
+
+            m_Domain.SetDataSize(iSize);
         }
 
         protected void BuildGlobalStiffnessMatrix()
         {
-            int iMatrixDimensionSize = m_AllDegreeOfFreedomSet.Count;
-
-            foreach (Tuple<int, DegreeType> tuple in m_SupportDegreeOfFreedomSet)
+            foreach (ElementMatrix matrix in m_Domain.ElementMatrixList)
             {
-                if (m_AllDegreeOfFreedomSet.Contains(tuple))
-                    --iMatrixDimensionSize;
-            }
-
-            m_GlobalStiffnessMatrix = new SparseMatrix(iMatrixDimensionSize, iMatrixDimensionSize);
-            foreach (ElementMatrix matrix in m_ElementMatrixList)
-            {
-                matrix.CopyToGlobalMatrix(m_GlobalStiffnessMatrix, m_GlobalIndexDictionary);
+                matrix.CopyToGlobalMatrix(m_Domain.GlobalStiffnessMatrix, m_Domain.GlobalIndexDictionary);
             }
         }
 
         protected void BuildLoadsVector()
         {
-            int iVectorDimensionSize = m_AllDegreeOfFreedomSet.Count;
-
-            foreach (Tuple<int, DegreeType> tuple in m_SupportDegreeOfFreedomSet)
-            {
-                if (m_AllDegreeOfFreedomSet.Contains(tuple))
-                    --iVectorDimensionSize;
-            }
-
-            m_LoadsVector = new SparseVector(iVectorDimensionSize);
             foreach (Load load in m_Model.Loads)
             {
                 if (load is ConcentratedNodalLoad)
@@ -185,20 +175,20 @@ namespace GreenEngine
                     int xIndex = -1;
                     int yIndex = -1;
 
-                    if (m_GlobalIndexDictionary.ContainsKey(xTuple))
-                        xIndex = m_GlobalIndexDictionary[xTuple];
+                    if (m_Domain.GlobalIndexDictionary.ContainsKey(xTuple))
+                        xIndex = m_Domain.GlobalIndexDictionary[xTuple];
 
-                    if (m_GlobalIndexDictionary.ContainsKey(yTuple))
-                        yIndex = m_GlobalIndexDictionary[yTuple];
+                    if (m_Domain.GlobalIndexDictionary.ContainsKey(yTuple))
+                        yIndex = m_Domain.GlobalIndexDictionary[yTuple];
 
                     if (xIndex >= 0)
                     {
-                        m_LoadsVector[xIndex] += conLoad.X;
+                        m_Domain.LoadsVector[xIndex] += conLoad.X;
                     }
 
                     if (yIndex >= 0)
                     {
-                        m_LoadsVector[yIndex] += conLoad.Y;
+                        m_Domain.LoadsVector[yIndex] += conLoad.Y;
                     }
                 }
             }
@@ -206,24 +196,26 @@ namespace GreenEngine
 
         protected void BuildSupportReactionsVector()
         {
-            Matrix<double> supportGlobalStiffnessMatrix = new SparseMatrix(m_SupportDegreeOfFreedomSet.Count, m_AllDegreeOfFreedomSet.Count);
+            // NOTE: This should probably be moved to the domain eventually.
 
-            foreach (ElementMatrix matrix in m_ElementMatrixList)
+            Matrix<double> supportGlobalStiffnessMatrix = new SparseMatrix(m_Domain.SupportDegreeOfFreedomSet.Count, m_Domain.AllDegreeOfFreedomSet.Count);
+
+            foreach (ElementMatrix matrix in m_Domain.ElementMatrixList)
             {
-                matrix.CopyToSupportMatrix(supportGlobalStiffnessMatrix, m_SupportGlobalIndexDictionary, m_AllGlobalIndexDictionary);
+                matrix.CopyToSupportMatrix(supportGlobalStiffnessMatrix, m_Domain.SupportGlobalIndexDictionary, m_Domain.AllGlobalIndexDictionary);
             }
 
-            Vector<double> displacementVector = new SparseVector(m_AllDegreeOfFreedomSet.Count);
-            foreach (Tuple<int, DegreeType> dof in m_AllDegreeOfFreedomSet)
+            Vector<double> displacementVector = new SparseVector(m_Domain.AllDegreeOfFreedomSet.Count);
+            foreach (Tuple<int, DegreeType> dof in m_Domain.AllDegreeOfFreedomSet)
             {
-                int globalIndex = m_GlobalIndexDictionary[dof];
-                int allGlobalIndex = m_AllGlobalIndexDictionary[dof];
+                int globalIndex = m_Domain.GlobalIndexDictionary[dof];
+                int allGlobalIndex = m_Domain.AllGlobalIndexDictionary[dof];
 
                 if (globalIndex >= 0)
-                    displacementVector[allGlobalIndex] = m_DisplacementsVector[globalIndex];
+                    displacementVector[allGlobalIndex] = m_Domain.DisplacementsVector[globalIndex];
             }
 
-            m_SupportReactionsVector = supportGlobalStiffnessMatrix.Multiply(displacementVector);
+            m_Domain.SupportReactionsVector = supportGlobalStiffnessMatrix.Multiply(displacementVector);
         }
 
         protected AnalysisResults BuildResults()
@@ -231,14 +223,7 @@ namespace GreenEngine
             ResultsBuilder resultsBuilder = new ResultsBuilder();
 
             resultsBuilder.Model = m_Model;
-            resultsBuilder.ElementMatrixList = m_ElementMatrixList;
-            resultsBuilder.AllDegreeOfFreedomSet = m_AllDegreeOfFreedomSet;
-            resultsBuilder.SupportDegreeOfFreedomSet = m_SupportDegreeOfFreedomSet;
-            resultsBuilder.AllGlobalIndexDictionary = m_AllGlobalIndexDictionary;
-            resultsBuilder.SupportGlobalIndexDictionary = m_SupportGlobalIndexDictionary;
-            resultsBuilder.GlobalIndexDictionary = m_GlobalIndexDictionary;
-            resultsBuilder.DisplacementsVector = m_DisplacementsVector;
-            resultsBuilder.SupportReactionsVector = m_SupportReactionsVector;
+            resultsBuilder.Domain = m_Domain;
 
             return resultsBuilder.BuildResults();
         }

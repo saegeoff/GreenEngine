@@ -10,8 +10,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -61,7 +59,6 @@
     <Compile Include="Results\NodalDisplacement.cs" />
     <Compile Include="Results\NodalDisplacementCollection.cs" />
     <Compile Include="Results\AnalysisResults.cs" />
-    <Compile Include="MasterMatrices\GlobalMatrix.cs" />
     <Compile Include="Results\SupportReaction.cs" />
     <Compile Include="Results\SupportReactionCollection.cs" />
     <Compile Include="ResultsBuilder.cs" />
@@ -71,12 +68,13 @@
     <Compile Include="Results\ElementAction.cs" />
     <Compile Include="Results\ElementActionCollection.cs" />
     <Compile Include="SystemTypes.cs" />
+    <Compile Include="Domain\AnalysisDomain.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Results\" />
-    <Folder Include="MasterMatrices\" />
     <Folder Include="Output\" />
+    <Folder Include="Domain\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

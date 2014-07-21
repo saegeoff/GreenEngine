@@ -19,15 +19,7 @@ namespace GreenEngine
     class ResultsBuilder
     {
         protected FiniteElementModel m_Model;
-        protected List<ElementMatrix> m_ElementMatrixList;
-        protected SortedSet<Tuple<int, DegreeType>> m_AllDegreeOfFreedomSet;
-        protected SortedSet<Tuple<int, DegreeType>> m_SupportDegreeOfFreedomSet;
-        protected Dictionary<Tuple<int, DegreeType>, int> m_AllGlobalIndexDictionary;
-        protected Dictionary<Tuple<int, DegreeType>, int> m_SupportGlobalIndexDictionary;
-        protected Dictionary<Tuple<int, DegreeType>, int> m_GlobalIndexDictionary;
-        protected Vector<double> m_DisplacementsVector;
-        //protected Matrix<double> globalStiffnessMatrix;
-        protected Vector<double> m_SupportReactionsVector;
+        protected AnalysisDomain m_Domain;
 
         public ResultsBuilder()
         {
@@ -39,52 +31,10 @@ namespace GreenEngine
             set { m_Model = value; }
         }
 
-        public List<ElementMatrix> ElementMatrixList
-        { 
-            get { return m_ElementMatrixList; }
-            set { m_ElementMatrixList = value; }
-        }
-
-        public SortedSet<Tuple<int, DegreeType>>  AllDegreeOfFreedomSet
-        { 
-            get { return m_AllDegreeOfFreedomSet; }
-            set { m_AllDegreeOfFreedomSet = value; }
-        }
-
-        public SortedSet<Tuple<int, DegreeType>>  SupportDegreeOfFreedomSet
-        { 
-            get { return m_SupportDegreeOfFreedomSet; }
-            set { m_SupportDegreeOfFreedomSet = value; }
-        }
-
-        public Dictionary<Tuple<int, DegreeType>, int> AllGlobalIndexDictionary
-        { 
-            get { return m_AllGlobalIndexDictionary; }
-            set { m_AllGlobalIndexDictionary = value; }
-        }
-
-        public Dictionary<Tuple<int, DegreeType>, int> GlobalIndexDictionary
-        { 
-            get { return m_GlobalIndexDictionary; }
-            set { m_GlobalIndexDictionary = value; }
-        }
-
-        public Dictionary<Tuple<int, DegreeType>, int> SupportGlobalIndexDictionary
-        { 
-            get { return m_SupportGlobalIndexDictionary; }
-            set { m_SupportGlobalIndexDictionary = value; }
-        }
-
-        public Vector<double> DisplacementsVector
-        { 
-            get { return m_DisplacementsVector; }
-            set { m_DisplacementsVector = value; }
-        }
-
-        public Vector<double> SupportReactionsVector
-        { 
-            get { return m_SupportReactionsVector; }
-            set { m_SupportReactionsVector = value; }
+        public AnalysisDomain Domain
+        {
+            get { return m_Domain; }
+            set { m_Domain = value; }
         }
 
         public AnalysisResults BuildResults()
@@ -114,20 +64,20 @@ namespace GreenEngine
                 displacementDictionary.Add(node.NodeId, displacement);  
             }
 
-            foreach (Tuple<int, DegreeType> degree in m_AllDegreeOfFreedomSet)
+            foreach (Tuple<int, DegreeType> degree in m_Domain.AllDegreeOfFreedomSet)
             {
-                int index = m_GlobalIndexDictionary[degree];
+                int index = m_Domain.GlobalIndexDictionary[degree];
 
                 if (index >= 0)
                 {
                     NodalDisplacement displacement = displacementDictionary[degree.Item1];
 
                     if (degree.Item2 == DegreeType.Fx)
-                        displacement.Tx = m_DisplacementsVector[index];
+                        displacement.Tx = m_Domain.DisplacementsVector[index];
                     else if (degree.Item2 == DegreeType.Fy)
-                        displacement.Ty = m_DisplacementsVector[index];
+                        displacement.Ty = m_Domain.DisplacementsVector[index];
                     else if (degree.Item2 == DegreeType.Mz)
-                        displacement.Rz = m_DisplacementsVector[index];
+                        displacement.Rz = m_Domain.DisplacementsVector[index];
                     else
                         System.Diagnostics.Debug.Assert(false);
                 }
@@ -145,7 +95,7 @@ namespace GreenEngine
                 stressDictionary.Add(element.ElementId, stress);  
             }
 
-            foreach (ElementMatrix matrix in m_ElementMatrixList)
+            foreach (ElementMatrix matrix in m_Domain.ElementMatrixList)
             {
                 if (matrix is TrussElementMatrix2d)
                 {
@@ -162,22 +112,22 @@ namespace GreenEngine
                     Tuple<int, DegreeType> x2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Fx);
                     Tuple<int, DegreeType> y2Tuple = new Tuple<int, DegreeType>(trussMatrix.NodeId2, DegreeType.Fy);
 
-                    int q1Index = m_GlobalIndexDictionary[x1Tuple];
-                    int q2Index = m_GlobalIndexDictionary[y1Tuple];
-                    int q3Index = m_GlobalIndexDictionary[x2Tuple];
-                    int q4Index = m_GlobalIndexDictionary[y2Tuple];
+                    int q1Index = m_Domain.GlobalIndexDictionary[x1Tuple];
+                    int q2Index = m_Domain.GlobalIndexDictionary[y1Tuple];
+                    int q3Index = m_Domain.GlobalIndexDictionary[x2Tuple];
+                    int q4Index = m_Domain.GlobalIndexDictionary[y2Tuple];
 
                     if (q1Index >= 0)
-                        q1 = m_DisplacementsVector [q1Index];
+                        q1 = m_Domain.DisplacementsVector [q1Index];
 
                     if (q2Index >= 0)
-                        q2 = m_DisplacementsVector [q2Index];
+                        q2 = m_Domain.DisplacementsVector [q2Index];
 
                     if (q3Index >= 0)
-                        q3 = m_DisplacementsVector [q3Index];
+                        q3 = m_Domain.DisplacementsVector [q3Index];
 
                     if (q4Index >= 0)
-                        q4 = m_DisplacementsVector [q4Index];
+                        q4 = m_Domain.DisplacementsVector [q4Index];
 
                     stress.Stress = trussMatrix.GetStress(q1, q2, q3, q4);
                 }
@@ -195,13 +145,13 @@ namespace GreenEngine
                 supportReactionDictionary.Add(support.Node.NodeId, supportReaction);
             }
 
-            foreach (Tuple<int, DegreeType> supportDegree in m_SupportDegreeOfFreedomSet)
+            foreach (Tuple<int, DegreeType> supportDegree in m_Domain.SupportDegreeOfFreedomSet)
             {
-                if (!m_SupportGlobalIndexDictionary.ContainsKey(supportDegree))
+                if (!m_Domain.SupportGlobalIndexDictionary.ContainsKey(supportDegree))
                     continue;
 
-                int supportIndex = m_SupportGlobalIndexDictionary[supportDegree];
-                double reactionValue = m_SupportReactionsVector[supportIndex];
+                int supportIndex = m_Domain.SupportGlobalIndexDictionary[supportDegree];
+                double reactionValue = m_Domain.SupportReactionsVector[supportIndex];
 
                 SupportReaction supportReaction = supportReactionDictionary[supportDegree.Item1];
 
