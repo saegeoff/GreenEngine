@@ -41,8 +41,6 @@ namespace GreenEngineConsole
             testList.Add(new BeamTest1());
             testList.Add(new BeamTest2());
 
-            int iId = 0;
-
             foreach (Test test in testList)
             {
                 Console.Write(test.Name + ": ");

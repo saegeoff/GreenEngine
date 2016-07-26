@@ -86,13 +86,6 @@ namespace GreenEngine.ElementMatrices
         {
             get { return m_NodeId2; }
         }
-
-        public int ElementId
-        {
-            get { return m_ElementId; }
-        }
-
-
     }
 }
 
